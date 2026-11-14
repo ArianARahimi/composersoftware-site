@@ -5,8 +5,9 @@ Static site. No build step.
 - `index.html`, `404.html`: pages
 - `style.css`: styles, colors at the top
 - `site.js`: clock
-- `fonts/`: `Web437_IBM_VGA_8x16.woff` from the
-  [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) (CC BY-SA 4.0)
+- `fonts/`: `Px437_IBM_VGA_8x16.woff2`, converted from the TTF in the
+  [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) v2.2 by VileR
+  (CC BY-SA 4.0, see `fonts/LICENSE.TXT`)
 
 Hidden projects are commented out in `index.html`.
 
