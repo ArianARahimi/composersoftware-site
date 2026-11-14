@@ -6,11 +6,19 @@
   font-display: swap;
 }
 
+/* the copyright sign, from the PxPlus version of the same font (not in Px437) */
+@font-face {
+  font-family: "IBM VGA";
+  src: url("fonts/PxPlus_IBM_VGA_8x16-copyright.woff2") format("woff2");
+  unicode-range: U+00A9;
+  font-display: swap;
+}
+
 /* ZealOS colors */
 :root {
   --bg: #000000;
   --text: #ffffff;
-  --dim: #888888;
+  --dim: #666666;
   --blue: #3465a4;
   --light-blue: #729fcf;
   --dark-blue: #0000aa;

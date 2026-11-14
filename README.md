@@ -8,6 +8,8 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 - `fonts/`: `Px437_IBM_VGA_8x16.woff2`, converted from the TTF in the
   [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) v2.2 by VileR
   (CC BY-SA 4.0, see `fonts/LICENSE.TXT`)
+- `fonts/PxPlus_IBM_VGA_8x16-copyright.woff2`: only the © sign from PxPlus_IBM_VGA_8x16
+  (same pack and license), since Px437 has no ©
 
 Links use clean addresses (`/projects`, not `projects.html`). GitHub Pages serves
 those; a local preview server may need the `.html` typed in.
