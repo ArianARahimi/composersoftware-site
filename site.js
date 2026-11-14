@@ -1,18 +1,90 @@
-// top bar clock
+// the tagline is a prompt you can type over (desktop only).
+// Other scripts can follow it through its "text" event and stop typing
+// by setting data-locked on the line.
 
-const clock = document.getElementById("clock");
+const line = document.querySelector(".typer");
+const desktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-function pad(n) {
-  return String(n).padStart(2, "0");
+if (line && desktop) {
+  const text = line.querySelector(".type");
+  const cursor = line.querySelector(".cursor");
+  const input = document.createElement("input");
+
+  input.type = "text";
+  input.value = text.textContent;
+  input.maxLength = 30;
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.setAttribute("aria-label", "Type here");
+  line.append(input);
+
+  function toEnd() {
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+  }
+
+  function show() {
+    text.classList.add("live");
+    text.textContent = input.value;
+    toEnd();
+    cursor.style.animation = "none";
+    void cursor.offsetWidth;
+    cursor.style.animation = "blink 1s steps(1) 0.5s infinite";
+    line.dispatchEvent(new CustomEvent("text", { detail: input.value }));
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("beforeinput", (e) => {
+    if (line.dataset.locked && e.inputType.startsWith("insert")) e.preventDefault();
+  });
+  input.addEventListener("keyup", toEnd);
+  input.addEventListener("click", toEnd);
+
+  // start typing anywhere on the page, no click needed
+  document.addEventListener("keydown", (e) => {
+    if (e.target === input || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (e.key === "Backspace") {
+      input.value = input.value.slice(0, -1);
+    } else if (e.key.length === 1) {
+      if (!line.dataset.locked && input.value.length < input.maxLength) input.value += e.key;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    input.focus({ preventScroll: true });
+    show();
+  });
 }
 
-function tick() {
-  const d = new Date();
-  clock.textContent = `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${pad(d.getFullYear() % 100)} ` +
-                      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+// download windows close on a click well outside them, after a choice, or on Escape.
+// The slack keeps a near miss from closing the window by accident.
+
+const downloads = document.querySelectorAll(".download");
+const slack = 24;
+const shadow = 12;
+
+function nearWindow(d, x, y) {
+  const a = d.querySelector("summary").getBoundingClientRect();
+  const b = d.querySelector(".dos").getBoundingClientRect();
+  return x >= Math.min(a.left, b.left) - slack &&
+         x <= Math.max(a.right, b.right + shadow) + slack &&
+         y >= Math.min(a.top, b.top) - slack &&
+         y <= Math.max(a.bottom, b.bottom + shadow) + slack;
 }
 
-if (clock) {
-  tick();
-  setInterval(tick, 1000);
-}
+document.addEventListener("click", (e) => {
+  for (const d of downloads) {
+    if (!d.open) continue;
+    if (d.contains(e.target)) {
+      if (e.target.closest(".dos-menu a")) setTimeout(() => { d.open = false; });
+      continue;
+    }
+    if (!nearWindow(d, e.clientX, e.clientY)) d.open = false;
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  for (const d of downloads) d.open = false;
+});

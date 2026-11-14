@@ -4,112 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Composer Software</title>
-<meta name="description" content="Composer Software. Desktop tools and games.">
+<meta name="description" content="Composer Software. We make what we like.">
 <meta name="color-scheme" content="dark">
+<meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
 <meta property="og:title" content="Composer Software">
-<meta property="og:description" content="Desktop tools and games.">
+<meta property="og:description" content="We make what we like.">
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css">
-<script src="site.js" defer></script>
+<link rel="stylesheet" href="style.css?v=12">
+<script src="site.js?v=12" defer></script>
 </head>
 <body>
 
-<header class="topbar">
-  <a class="tab" href="#top">MENU</a>
-  <span class="topbar-title">Composer Software</span>
-  <span class="clock" id="clock" aria-hidden="true"></span>
+<header class="top">
+  <nav aria-label="Site">
+    <a class="brand" href="/">Composer Software</a>
+    <ul>
+      <li><a href="/" aria-current="page">Home</a></li>
+      <li><a href="/projects">Projects</a></li>
+    </ul>
+  </nav>
 </header>
 
-<main class="win" id="top">
-  <div class="win-title"><span>C:/Home</span><span class="win-x" aria-hidden="true">[X]</span></div>
-
-  <p class="cmd"><span class="prompt">C:/Home&gt;</span>Cd("Composer Software");Dir;</p>
-
-  <h1 class="banner">COMPOSER SOFTWARE</h1>
-  <p>Desktop tools and games.</p>
-
-  <nav class="drives" aria-label="Sections">
-    <a href="#projects">Projects</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </nav>
-
-  <section id="projects">
-    <h2>Projects Report:</h2>
-    <ul class="dir">
-      <li class="dir-head" aria-hidden="true"><span>STATUS</span><span>NAME</span><span>KIND</span></li>
-
-      <li>
-        <span class="ok">RELEASED</span>
-        <a href="https://github.com/ArianARahimi/vt-quarantine">VirusTotal Quarantine</a>
-        <span class="val">Desktop app</span>
-        <p class="desc">Keeps downloads in a quarantine folder until VirusTotal has
-          checked them. Windows, macOS and Linux. MIT license.</p>
-        <p class="links"><a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest">Download</a>
-          <a href="https://github.com/ArianARahimi/vt-quarantine">Source</a></p>
-      </li>
-
-      <!-- hidden projects -->
-
-      <!--
-      <li>
-        <span class="wip">IN DEV</span>
-        <span class="name">yt-dlp wrapper</span>
-        <span class="val">Desktop app</span>
-        <p class="desc">A plain window for downloading video and audio with yt-dlp. Rust and Tauri.</p>
-      </li>
-      -->
-
-      <!--
-      <li>
-        <span class="wip">IN DEV</span>
-        <span class="name">Rage Bait Simulator</span>
-        <span class="val">Game</span>
-        <p class="desc">A management sim about running a rage-bait company. Custom C++ engine.</p>
-      </li>
-      -->
-
-      <!--
-      <li>
-        <span class="wip">PROTO</span>
-        <span class="name">Super Princess Pudding</span>
-        <span class="val">Game</span>
-        <p class="desc">A melee combat slice in Unreal Engine 4.27.</p>
-      </li>
-      -->
-    </ul>
+<main>
+  <section class="hero">
+    <div class="hero-text">
+    <h1>Composer<br>Software</h1>
+    <p class="prompt typer"><span class="path">C:/Home&gt;</span> <span class="type">We make what we like.</span><span class="cursor" aria-hidden="true"></span></p>
+    <p class="buttons"><a class="button" href="/projects">Projects</a><a class="button" href="https://github.com/ArianARahimi">GitHub</a></p>
+    </div>
   </section>
 
-  <section id="about">
-    <h2>About Report:</h2>
-    <p>Composer Software makes desktop tools and games.</p>
-    <p>Games are next.</p>
-    <dl class="facts">
-      <dt>Languages:</dt><dd>C++, Rust, Python</dd>
-      <dt>Engines:</dt><dd>Unreal Engine, a custom C++ engine</dd>
-      <dt>Status:</dt><dd>Building</dd>
-    </dl>
-  </section>
-
-  <section id="contact">
-    <h2>Contact Report:</h2>
-    <dl class="facts">
-      <dt>GitHub:</dt><dd><a href="https://github.com/ArianARahimi">github.com/ArianARahimi</a></dd>
-      <!-- <dt>Email:</dt><dd><a href="mailto:you@composersoftware.net">you@composersoftware.net</a></dd> -->
-    </dl>
-  </section>
-
-  <p class="cmd end"><span class="prompt">C:/Home&gt;</span><span class="cursor" aria-hidden="true"></span></p>
-
-  <div class="win-foot" aria-hidden="true">EOF</div>
+  <h2 class="section">Latest</h2>
+  <div class="grid">
+  <article class="win">
+    <header class="win-bar"><h2>VirusTotal Quarantine</h2><span class="win-tag">RELEASED</span></header>
+    <div class="win-body">
+      <p>Keeps downloads in a quarantine folder until VirusTotal has checked them.</p>
+      <dl class="facts">
+        <dt>Runs on:</dt><dd>Windows, macOS, Linux</dd>
+        <dt>License:</dt><dd>MIT</dd>
+      </dl>
+    </div>
+    <div class="win-foot">
+      <details class="download">
+        <summary>Download</summary>
+        <div class="dos-wrap">
+          <div class="dos">
+            <p class="dos-title">Download</p>
+            <ul class="dos-menu">
+              <li><a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/VirusTotal-Quarantine-Windows.msi"><span class="icon icon-windows" aria-hidden="true"></span><span><span class="key">W</span>indows</span><span class="note">.msi</span></a></li>
+              <li><a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/VirusTotal-Quarantine-macOS.zip"><span class="icon icon-macos" aria-hidden="true"></span><span><span class="key">m</span>acOS</span><span class="note">.zip</span></a></li>
+              <li><a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest"><span class="icon icon-linux" aria-hidden="true"></span><span><span class="key">L</span>inux</span><span class="note">GitHub</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </details>
+      <a href="https://github.com/ArianARahimi/vt-quarantine">Source</a>
+    </div>
+  </article>
+  </div>
 </main>
 
-<footer class="foot">
-  <p>&copy; 2026 Composer Software</p>
-  <p class="credit">Font: IBM VGA 8x16 from the <a href="https://int10h.org/oldschool-pc-fonts/">Ultimate Oldschool PC Font Pack</a> by VileR, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+<footer class="site">
+  <p>Copyright 2026 Composer Software</p>
+  <p>Font: IBM VGA 8x16 from the <a href="https://int10h.org/oldschool-pc-fonts/">Ultimate Oldschool PC Font Pack</a> by VileR, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
 </footer>
 
 </body>
