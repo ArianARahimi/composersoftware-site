@@ -20,7 +20,6 @@ so browsers don't mix a cached old file with the new pages.
 The download window has a 32x32 slot per system. Put the pixel art in
 `icons/windows.png`, `icons/macos.png` and `icons/linux.png`. Draw at 32x32 so
 one art pixel is one screen pixel, like the font (16x16 also works, doubled).
-Then remove its name from the placeholder rule at the end of `style.css`.
 
 ## Hosting
 

@@ -252,9 +252,6 @@ footer.site p + p { margin-top: 4px; }
 .icon-macos { background-image: url("icons/macos.png"); }
 .icon-linux { background-image: url("icons/linux.png"); }
 
-/* placeholder for icons not drawn yet: remove each name as its art is added */
-.icon-linux { outline: 1px dashed #555555; outline-offset: -1px; }
-
 /* small phones: narrower tiles so the download window fits a 320px screen */
 @media (max-width: 420px) {
   .dos-menu a { width: 72px; }
