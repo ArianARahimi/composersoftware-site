@@ -455,8 +455,8 @@ function sandIn(h, done) {
 }
 
 // laser: one beam from above right etches the title a font pixel at a time,
-// wandering along the strokes (a random walk that backs up when it gets
-// stuck, letters in reading order). Each pixel glows hot and cools to pink,
+// hopping between random spots (a maze walk over the title box). Each pixel
+// glows hot and cools to pink,
 // and throws a one-pixel spark that falls and cools out.
 function laserIn(h, done) {
   const px = textPixel();
@@ -472,54 +472,40 @@ function laserIn(h, done) {
   const colourAt = (stops, age) => stops.reduce((c, [from, col]) => (age >= from ? col : c), stops[0][1]);
   const snap = (v) => Math.round(v / px) * px;
 
-  // the lit font pixels, in reading order: line, letter, then top to bottom
+  // the lit font pixels
   const gw = Math.floor(t.w / fp), gh = Math.floor(t.ht / fp);
   const data = src.getContext("2d").getImageData(0, 0, t.w, t.ht).data;
   const lit = new Uint8Array(gw * gh);
-  const order = [];
   for (let gy = 0; gy < gh; gy++) {
     for (let gx = 0; gx < gw; gx++) {
-      if (!data[((gy * fp + (fp >> 1)) * t.w + gx * fp + (fp >> 1)) * 4 + 3]) continue;
-      lit[gy * gw + gx] = 1;
-      order.push(gy * gw + gx);
+      if (data[((gy * fp + (fp >> 1)) * t.w + gx * fp + (fp >> 1)) * 4 + 3]) lit[gy * gw + gx] = 1;
     }
   }
-  const key = (i) => {
-    const gx = i % gw, gy = (i - gx) / gw;
-    return [Math.floor(gy * fp / line), Math.floor(gx * fp / cell), gy, gx];
-  };
-  order.sort((a, b) => {
-    const ka = key(a), kb = key(b);
-    return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2] || ka[3] - kb[3];
-  });
 
-  // the laser's path: from each letter's first pixel, step to a random unetched
-  // neighbour; with none left, back up to the last pixel that has one
+  // the laser's path: a maze walk over the whole title box from a random spot,
+  // backing up when stuck; only lit pixels get etched, so the beam jumps
+  // around the title instead of tracing letters in order
   const seen = new Uint8Array(gw * gh);
   const path = [];
-  for (const first of order) {
-    if (seen[first]) continue;
-    seen[first] = 1;
-    path.push(first);
-    const stack = [first];
-    while (stack.length) {
-      const c = stack[stack.length - 1], cx = c % gw, cy = (c - cx) / gw;
-      const next = [];
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = cx + dx, ny = cy + dy, n = ny * gw + nx;
-          if ((dx || dy) && nx >= 0 && nx < gw && ny >= 0 && ny < gh && lit[n] && !seen[n]) next.push(n);
-        }
-      }
-      if (!next.length) {
-        stack.pop();
-        continue;
-      }
-      const n = next[Math.floor(Math.random() * next.length)];
-      seen[n] = 1;
-      path.push(n);
-      stack.push(n);
+  const first = Math.floor(Math.random() * gw * gh);
+  const stack = [first];
+  seen[first] = 1;
+  if (lit[first]) path.push(first);
+  while (stack.length) {
+    const c = stack[stack.length - 1], cx = c % gw;
+    const next = [];
+    if (cx > 0 && !seen[c - 1]) next.push(c - 1);
+    if (cx < gw - 1 && !seen[c + 1]) next.push(c + 1);
+    if (c >= gw && !seen[c - gw]) next.push(c - gw);
+    if (c + gw < gw * gh && !seen[c + gw]) next.push(c + gw);
+    if (!next.length) {
+      stack.pop();
+      continue;
     }
+    const n = next[Math.floor(Math.random() * next.length)];
+    seen[n] = 1;
+    if (lit[n]) path.push(n);
+    stack.push(n);
   }
 
   const etchEnd = RASTER_MS - COOL[COOL.length - 1][0] - 20;   // the last pixel is pink before the end
