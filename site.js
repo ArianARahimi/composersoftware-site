@@ -132,15 +132,16 @@ const title = document.querySelector(".hero h1");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const RASTER_MS = 1300;
 
-// each effect: (row index, row position in title pixels, progress 0..1, title pixel)
-// returns { x, y } for that row
+// each effect: (row index, row position in title pixels, progress 0..1, title pixel,
+// random start) returns { x, y } for that row. The random start shifts where
+// the wave begins and mirrors its first swing, so no two visits look the same.
 const EFFECTS = {
   // neighbouring rows swing in opposite directions
-  interlace: (i, r, p, big) => ({ x: (i % 2 ? 1 : -1) * 24 * big * (1 - p) ** 2 * Math.cos(r * 0.35 - p * 16) }),
+  interlace: (i, r, p, big, s) => ({ x: s.flip * (i % 2 ? 1 : -1) * 24 * big * (1 - p) ** 2 * Math.cos(r * 0.35 - p * 16 + s.phase) }),
   // all rows sway together in a travelling wave, like a flag
-  ripple: (_i, r, p, big) => ({ x: 36 * big * (1 - p) ** 2 * Math.sin(r * 0.25 - p * 14) }),
+  ripple: (_i, r, p, big, s) => ({ x: s.flip * 36 * big * (1 - p) ** 2 * Math.sin(r * 0.25 - p * 14 + s.phase) }),
   // rows bunch up and stretch vertically
-  squash: (_i, r, p, big) => ({ y: 10 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12) }),
+  squash: (_i, r, p, big, s) => ({ y: s.flip * 10 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12 + s.phase) }),
 };
 
 function pickEffect() {
@@ -155,6 +156,7 @@ function pickEffect() {
 
 function rasterIn(h) {
   const effect = EFFECTS[pickEffect()];
+  const start = { phase: Math.random() * Math.PI * 2, flip: Math.random() < 0.5 ? -1 : 1 };
   const px = parseFloat(getComputedStyle(document.body).fontSize) / 16;   // regular text pixel
   const big = parseFloat(getComputedStyle(h).fontSize) / 16;              // title pixel
   const height = Math.round(h.getBoundingClientRect().height);
@@ -178,7 +180,7 @@ function rasterIn(h) {
   function frame(now) {
     const p = Math.min(1, (now - t0) / RASTER_MS);
     rows.forEach((row, i) => {
-      const f = effect(i, i * px / big, p, big);
+      const f = effect(i, i * px / big, p, big, start);
       row.style.transform = `translate(${snap(f.x)}px, ${snap(f.y)}px)`;
     });
     if (p < 1) {
