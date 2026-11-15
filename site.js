@@ -123,9 +123,9 @@ for (const card of document.querySelectorAll(".card-link")) {
 }
 
 // home page title: a Game Boy style raster slide-in. The title is cut into
-// rows one font pixel tall. Even rows slide in from the left edge, odd rows
-// from the right, while a sine wave travels down the rows and calms down as
-// the title lands. Positions snap to whole font pixels, like old hardware.
+// rows one font pixel tall. Even and odd rows swing in opposite directions
+// along a sine wave that travels down the title and calms down until the
+// title is still. Positions snap to whole font pixels, like old hardware.
 
 const title = document.querySelector(".hero h1");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -135,12 +135,6 @@ function rasterIn(h) {
   const px = parseFloat(getComputedStyle(h).fontSize) / 16;
   const height = Math.round(h.getBoundingClientRect().height);
   const count = Math.ceil(height / px);
-  // each side starts just off its own edge of the screen, so both enter at once
-  const range = document.createRange();
-  range.selectNodeContents(h);
-  const text = range.getBoundingClientRect();
-  const fromLeft = -Math.ceil(text.right + 16);
-  const fromRight = Math.ceil(window.innerWidth - text.left + 16);
   const box = document.createElement("div");
   box.className = "raster";
   box.setAttribute("aria-hidden", "true");
@@ -158,12 +152,11 @@ function rasterIn(h) {
   const t0 = performance.now();
   function frame(now) {
     const p = Math.min(1, (now - t0) / RASTER_MS);
-    const slide = Math.pow(1 - p, 3);           // eases into place
-    const amp = 10 * px * Math.pow(1 - p, 2);   // the wave calms down
+    const amp = 24 * px * Math.pow(1 - p, 2);   // the swing calms down
     rows.forEach((row, i) => {
-      const from = i % 2 ? fromRight : fromLeft;
-      const wave = amp * Math.sin(i * 0.45 - p * 14);
-      const x = Math.round((from * slide + wave) / px) * px;
+      const side = i % 2 ? 1 : -1;               // neighbours swing opposite ways
+      const wave = Math.cos(i * 0.35 - p * 16);
+      const x = Math.round((side * amp * wave) / px) * px;
       row.style.transform = `translateX(${x}px)`;
     });
     if (p < 1) {
