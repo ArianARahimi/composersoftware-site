@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # daily, so new releases of the projects show up on their own
+  schedule:
+    - cron: "17 6 * * *"
 
 permissions:
   contents: read
@@ -33,8 +36,11 @@ jobs:
       - name: Build
         run: |
           mkdir _site
-          rsync -a --exclude .git --exclude .github --exclude private --exclude _site --exclude README.md ./ _site/
+          rsync -a --exclude .git --exclude .github --exclude private --exclude _site --exclude tools --exclude README.md ./ _site/
           sh private/build.sh _site
+          python3 tools/releases.py _site
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
 

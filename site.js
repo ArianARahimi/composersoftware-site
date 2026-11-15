@@ -88,3 +88,36 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   for (const d of downloads) d.open = false;
 });
+
+// project windows: clicking the window opens its page. Download and Source
+// get a wide margin of error; the window only counts well away from them,
+// never while a download window is open, and only highlights when a click
+// would really open the page.
+
+const cardSlack = 16;
+
+function nearFoot(card, x, y) {
+  for (const el of card.querySelectorAll(".win-foot a, .win-foot summary")) {
+    const r = el.getBoundingClientRect();
+    if (x >= r.left - cardSlack && x <= r.right + cardSlack &&
+        y >= r.top - cardSlack && y <= r.bottom + cardSlack) return true;
+  }
+  return false;
+}
+
+function opensPage(card, e) {
+  if (e.target.closest("a, summary, details")) return false;
+  if (document.querySelector(".download[open]")) return false;
+  return !nearFoot(card, e.clientX, e.clientY);
+}
+
+for (const card of document.querySelectorAll(".card-link")) {
+  card.addEventListener("mousemove", (e) => card.classList.toggle("hot", opensPage(card, e)));
+  card.addEventListener("mouseleave", () => card.classList.remove("hot"));
+  card.addEventListener("click", (e) => {
+    if (!opensPage(card, e) || String(getSelection())) return;
+    card.classList.remove("hot");
+    if (e.ctrlKey || e.metaKey) window.open(card.dataset.href);
+    else location.href = card.dataset.href;
+  });
+}

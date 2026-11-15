@@ -188,15 +188,18 @@ footer.site p + p { margin-top: 4px; }
   .project-body { grid-template-columns: 1fr; }
 }
 
-/* projects compendium: each card is one link to the project's page */
+/* project windows: the whole window opens the project page (site.js) */
 .intro { margin-bottom: 40px; color: var(--grey); }
-a.card { color: var(--text); text-decoration: none; }
-a.card .win-body { display: block; }
-.card-line { display: block; margin-bottom: 16px; }
-.card .facts { display: grid; }
-.card .open { color: var(--bright-cyan); }
-a.card:hover, a.card:focus-visible { border-color: var(--bright-cyan); outline: none; background: var(--bg); }
-a.card:hover .open, a.card:focus-visible .open { color: var(--bg); background: var(--bright-cyan); }
+.card-title { color: inherit; text-decoration: none; }
+.card-title:hover { color: inherit; background: none; }
+.card-link.hot { border-color: var(--yellow); cursor: pointer; }
+.card-link.hot .win-bar h2 { background: var(--yellow); }
+.card-link:has(.card-title:focus-visible) { border-color: var(--yellow); }
+/* Download and Source: invisible extra click area around each */
+.win-foot > a, .download summary { position: relative; }
+.win-foot > a::before, .download summary::before { content: ""; position: absolute; inset: -12px -8px; }
+.win-tag.wip { background: var(--magenta); }
+.dim { color: var(--dim); }
 
 /* project pages */
 .crumbs { margin-bottom: 24px; color: var(--grey); }

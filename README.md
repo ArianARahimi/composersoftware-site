@@ -17,6 +17,19 @@ those; a local preview server may need the `.html` typed in.
 When `style.css` or `site.js` changes, raise the `?v=` number in the HTML files
 so browsers don't mix a cached old file with the new pages.
 
+## Projects
+
+`projects/index.html` lists every project as a window that links to its own page
+(`projects/<name>.html`, served as `/projects/<name>`). The home page shows the
+latest one under Latest.
+
+Release info comes from GitHub when the site is built (on every push and once a
+day): `tools/releases.py` fills in any element marked
+`<span class="release" data-repo="OWNER/REPO" data-view="tag">…</span><!--/release-->`
+(`tag` = version and date, `notes` = what's new with a link). What's new is the
+release notes' "What's new" section if there is one, otherwise the commit titles
+since the previous release. For a new project, add the same markers.
+
 ## Download icons
 
 The download window has a 32x32 slot per system. Put the pixel art in
