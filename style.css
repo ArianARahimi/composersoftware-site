@@ -233,7 +233,7 @@ code { font: inherit; color: var(--yellow); }
 .dos-open { flex: none; }
 .get-side .buttons { margin-top: 8px; }
 .get-latest { margin-top: 28px; }
-.get-side .dim { margin-top: 12px; max-width: 40ch; }
+.get-note { margin-top: 12px; max-width: 40ch; color: var(--text); }
 
 /* phones */
 @media (max-width: 600px) {
