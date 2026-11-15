@@ -71,7 +71,7 @@ a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 }
 
 /* top bar: brand left, links right */
-.top { background: var(--cyan); }
+.top { position: sticky; top: 0; z-index: 30; background: var(--cyan); }
 .top nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; }
 .brand { padding: 4px 8px; color: var(--yellow); background: var(--dark-blue); text-decoration: none; }
 .brand:hover { color: var(--bg); background: var(--yellow); }
@@ -205,6 +205,26 @@ footer.site p + p { margin-top: 4px; }
 .crumbs { margin-bottom: 24px; color: var(--grey); }
 .wide-note { margin-bottom: 40px; }
 .how { row-gap: 8px; }
+
+/* bottom of every page: the way back without scrolling up */
+.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 24px; }
+
+/* guide topics: each one opens and closes on its own */
+#guide { scroll-margin-top: 48px; }
+.topic { margin-bottom: 4px; }
+.topic summary { display: block; padding: 4px 8px; color: var(--bright-cyan); cursor: pointer; list-style: none; }
+.topic summary::-webkit-details-marker { display: none; }
+.topic summary::before { content: "\25BA"; display: inline-block; width: 16px; color: var(--yellow); }
+.topic[open] summary::before { content: "\25BC"; }
+.topic summary:hover, .topic summary:focus-visible { color: var(--bg); background: var(--bright-cyan); outline: none; }
+.topic summary:hover::before, .topic summary:focus-visible::before { color: var(--bg); }
+.topic > :not(summary) { margin-left: 24px; }
+.topic[open] { margin-bottom: 16px; }
+.steps { margin: 8px 0 12px; padding-left: 32px; }
+.steps li { margin-bottom: 4px; }
+.steps .list { margin: 4px 0 0; }
+code { font: inherit; color: var(--yellow); }
+.more { margin-top: 16px; }
 
 /* phones */
 @media (max-width: 600px) {

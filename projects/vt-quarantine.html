@@ -9,10 +9,10 @@
 <meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://composersoftware.net/projects/vt-quarantine">
-<link rel="stylesheet" href="/style.css?v=17">
-<script src="/site.js?v=17" defer></script>
+<link rel="stylesheet" href="/style.css?v=18">
+<script src="/site.js?v=18" defer></script>
 </head>
-<body>
+<body id="top">
 
 <header class="top">
   <nav aria-label="Site">
@@ -25,7 +25,7 @@
 </header>
 
 <main>
-  <p class="crumbs"><a href="/projects/">Projects</a> <span aria-hidden="true">&gt;</span> VirusTotal Quarantine</p>
+  <p class="crumbs"><a href="/">Home</a> <span aria-hidden="true">&gt;</span> <a href="/projects/">Projects</a> <span aria-hidden="true">&gt;</span> VirusTotal Quarantine</p>
   <h1 class="page">VirusTotal Quarantine</h1>
   <article class="win project">
     <header class="win-bar"><h2>About</h2><span class="win-tag">RELEASED</span></header>
@@ -64,7 +64,102 @@
         </div>
       </details>
       <a href="https://github.com/ArianARahimi/vt-quarantine">Source</a>
-      <a href="https://github.com/ArianARahimi/vt-quarantine/blob/master/docs/GUIDE.md">Guide</a>
+      <a href="#guide">Guide</a>
+    </div>
+  </article>
+
+  <article class="win wide-note" id="guide">
+    <header class="win-bar"><h2>Guide</h2></header>
+    <div class="win-body">
+      <p>Click a topic to open it.</p>
+
+      <details class="topic" open>
+        <summary>Before you start: get a free VirusTotal API key</summary>
+        <ol class="steps">
+          <li><a href="https://www.virustotal.com/gui/join-us">Sign up for a free VirusTotal account</a>.</li>
+          <li>Open <a href="https://www.virustotal.com/gui/my-apikey">your API key page</a> and copy the key.</li>
+          <li>VirusTotal Quarantine asks for it the first time it runs. Paste it there.</li>
+        </ol>
+      </details>
+
+      <details class="topic">
+        <summary>Install on Windows</summary>
+        <ol class="steps">
+          <li>Click <a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/VirusTotal-Quarantine-Windows.msi">Download for Windows</a> and open the file.</li>
+          <li>If Edge holds it ("not commonly downloaded"): <code>...</code> menu, then Keep, then Keep anyway.</li>
+          <li>Paste your API key.</li>
+        </ol>
+        <p>It brings its own Python and needs no administrator rights.</p>
+      </details>
+
+      <details class="topic">
+        <summary>Install on macOS</summary>
+        <ol class="steps">
+          <li>Click <a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/VirusTotal-Quarantine-macOS.zip">Download for macOS</a>.</li>
+          <li>Open VirusTotal Quarantine in your Downloads. It moves itself to Applications.</li>
+          <li>The first time, macOS blocks it: click Done, then System Settings, Privacy &amp; Security, Open Anyway (near the bottom), and enter your password.</li>
+          <li>Paste your API key.</li>
+        </ol>
+      </details>
+
+      <details class="topic">
+        <summary>Install on Linux</summary>
+        <ol class="steps">
+          <li>Download the package for your system and install it:
+            <ul class="list">
+              <li>Ubuntu, Debian: <a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/vt-quarantine-linux.deb">.deb</a>, then <code>sudo apt install ./vt-quarantine-linux.deb</code></li>
+              <li>Fedora: <a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/vt-quarantine-linux.rpm">.rpm</a>, then <code>sudo dnf install ./vt-quarantine-linux.rpm</code></li>
+              <li>Arch: <a href="https://github.com/ArianARahimi/vt-quarantine/releases/latest/download/vt-quarantine-linux.pkg.tar.zst">.pkg.tar.zst</a>, then <code>sudo pacman -U vt-quarantine-linux.pkg.tar.zst</code></li>
+            </ul>
+          </li>
+          <li>Run <code>vt-quarantine --install</code> as yourself (not with sudo) and paste your API key.</li>
+        </ol>
+        <p>Other distributions: download the source and run <code>sh install.sh</code>.</p>
+      </details>
+
+      <details class="topic">
+        <summary>Your browsers</summary>
+        <p>It points your browsers at the quarantine folder by itself and turns off downloads
+          opening on their own. If a browser was open while it installed, restart that browser.</p>
+      </details>
+
+      <details class="topic">
+        <summary>When a file is flagged</summary>
+        <ol class="steps">
+          <li>The notification starts with Show report and Delete.</li>
+          <li>After Show report, a third button appears: Mark as safe. The other two stay in place, so a quick click never lands on the wrong one.</li>
+          <li>If 10 or more engines call it malicious, Mark as safe asks once more before letting it out.</li>
+        </ol>
+        <p>A flagged file you let through isn't remembered: download it again and you get the warning again.</p>
+      </details>
+
+      <details class="topic">
+        <summary>Downloads saved somewhere else</summary>
+        <p>Open VirusTotal Quarantine again (Start menu, app menu or Applications), then Settings, to choose:</p>
+        <ul class="list">
+          <li>Move into quarantine (the default): checked, then put back where you saved it</li>
+          <li>Check only: looked up where they are, and only a flagged one brings a notification</li>
+          <li>Off: only the quarantine folder is checked</li>
+        </ul>
+      </details>
+
+      <details class="topic">
+        <summary>Updates</summary>
+        <p>Once a day it checks for a new release and only installs one signed with the release key.
+          On Windows and macOS it updates by itself. A Linux package asks first, because installing needs your password.</p>
+      </details>
+
+      <details class="topic">
+        <summary>Uninstall</summary>
+        <ul class="list">
+          <li>Windows: Settings, Apps, VirusTotal Quarantine, Uninstall</li>
+          <li>macOS: drag VirusTotal Quarantine to the Trash, or open Uninstall VirusTotal Quarantine and click Remove</li>
+          <li>Linux: <code>vt-quarantine --uninstall</code>, then remove the package</li>
+        </ul>
+        <p>Your browsers get their download folder back. Files left in quarantine are unlocked, never deleted.</p>
+      </details>
+
+      <p class="more"><a href="https://github.com/ArianARahimi/vt-quarantine/blob/master/docs/GUIDE.md">Full guide on GitHub</a></p>
     </div>
   </article>
 
@@ -90,6 +185,7 @@
 </main>
 
 <footer class="site">
+  <nav class="foot-nav" aria-label="Site"><a href="/">Home</a><a href="/projects/">Projects</a><a href="#top">Back to top</a></nav>
   <p>&copy; 2026 Arian Rahimi, Composer Software</p>
   <p>Font: IBM VGA 8x16 from the <a href="https://int10h.org/oldschool-pc-fonts/">Ultimate Oldschool PC Font Pack</a> by VileR, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
 </footer>
