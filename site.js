@@ -123,16 +123,18 @@ for (const card of document.querySelectorAll(".card-link")) {
 }
 
 // home page title: a Game Boy style raster slide-in. The title is cut into
-// rows one font pixel tall. Even and odd rows swing in opposite directions
+// rows as thin as one pixel of the regular text, so the interlacing matches
+// the rest of the page even though the title is bigger. Even and odd rows swing in opposite directions
 // along a sine wave that travels down the title and calms down until the
-// title is still. Positions snap to whole font pixels, like old hardware.
+// title is still. Positions snap to whole pixels of the regular text.
 
 const title = document.querySelector(".hero h1");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const RASTER_MS = 1300;
 
 function rasterIn(h) {
-  const px = parseFloat(getComputedStyle(h).fontSize) / 16;
+  const px = parseFloat(getComputedStyle(document.body).fontSize) / 16;   // regular text pixel
+  const big = parseFloat(getComputedStyle(h).fontSize) / 16;              // title pixel
   const height = Math.round(h.getBoundingClientRect().height);
   const count = Math.ceil(height / px);
   const box = document.createElement("div");
@@ -152,10 +154,10 @@ function rasterIn(h) {
   const t0 = performance.now();
   function frame(now) {
     const p = Math.min(1, (now - t0) / RASTER_MS);
-    const amp = 24 * px * Math.pow(1 - p, 2);   // the swing calms down
+    const amp = 24 * big * Math.pow(1 - p, 2);  // the swing calms down
     rows.forEach((row, i) => {
       const side = i % 2 ? 1 : -1;               // neighbours swing opposite ways
-      const wave = Math.cos(i * 0.35 - p * 16);
+      const wave = Math.cos((i * px / big) * 0.35 - p * 16);
       const x = Math.round((side * amp * wave) / px) * px;
       row.style.transform = `translateX(${x}px)`;
     });
