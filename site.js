@@ -145,7 +145,7 @@ const ROW_EFFECTS = {
 };
 
 // every effect: (heading, done) and calls done() once the plain title is back
-const EFFECTS = { flip: flipUp };
+const EFFECTS = { flip: flipUp, hop: hopIn };
 for (const [name, fn] of Object.entries(ROW_EFFECTS)) EFFECTS[name] = (h, done) => rowsIn(h, fn, done);
 
 function pickEffect() {
@@ -205,21 +205,13 @@ function rowsIn(h, effect, done) {
   requestAnimationFrame(frame);
 }
 
-// Mode 7 style flip: each letter starts lying flat and turns up around its
-// middle to face you (top half tipped away, bottom half towards you), one
-// after another from the C to the last e. Drawn on a canvas a row at a time;
-// rows further back are narrower, nearer ones wider. Pixels are only doubled
-// or dropped (no smoothing), so it stays as sharp as the font.
-function flipUp(h, done) {
-  const TURN = 400;                                     // ms for one letter
+// the pink title drawn once on a canvas, for canvas effects to copy from;
+// anti-aliased edges are thresholded so only whole font pixels remain
+function pinkTitle(h) {
   const cs = getComputedStyle(h);
-  const px = textPixel();
   const w = h.clientWidth;
   const ht = Math.round(h.getBoundingClientRect().height);
   const line = parseFloat(cs.lineHeight);
-  const lines = h.innerHTML.split(/<br\s*\/?>/i);
-
-  // the pink title, drawn once to copy rows from
   const src = document.createElement("canvas");
   src.width = w;
   src.height = ht;
@@ -230,11 +222,10 @@ function flipUp(h, done) {
   const ascent = m.fontBoundingBoxAscent;
   const base = (line - ascent - m.fontBoundingBoxDescent) / 2 + ascent;
   const letters = [];
-  lines.forEach((text, row) => [...text].forEach((ch, col) => {
-    letters.push({ x: col * cell, y: row * line });
+  h.innerHTML.split(/<br\s*\/?>/i).forEach((text, row) => [...text].forEach((ch, col) => {
+    letters.push({ x: col * cell, y: row * line, row, col });
     sc.fillText(ch, col * cell, row * line + base);
   }));
-  // keep only whole font pixels, all in the same pink
   const pink = getComputedStyle(document.documentElement).getPropertyValue("--pink").trim();
   const rgb = [1, 3, 5].map((i) => parseInt(pink.slice(i, i + 2), 16));
   const img = sc.getImageData(0, 0, w, ht);
@@ -242,44 +233,27 @@ function flipUp(h, done) {
     img.data.set(img.data[i + 3] > 127 ? [...rgb, 255] : [0, 0, 0, 0], i);
   }
   sc.putImageData(img, 0, 0);
+  return { src, letters, cell, line, w, ht };
+}
 
-  // the near half of a letter grows past its cell, so the canvas gets a margin
-  const pad = Math.ceil(cell / 2 / px) * px;
+// runs draw(ctx, ms, pad) on a canvas over the title, `pad` pixels bigger on
+// every side, for RASTER_MS; then removes it and calls done()
+function canvasIn(h, t, pad, draw, done) {
   const cv = document.createElement("canvas");
-  cv.width = w + 2 * pad;
-  cv.height = ht + 2 * pad;
+  cv.width = t.w + 2 * pad;
+  cv.height = t.ht + 2 * pad;
   cv.style.left = cv.style.top = `${-pad}px`;
   cv.className = "raster raster-canvas";
   cv.setAttribute("aria-hidden", "true");
   const ctx = cv.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   h.append(cv);
-
-  const far = 3 * line;                                 // camera distance: perspective strength
-  const gap = (RASTER_MS - TURN) / Math.max(1, letters.length - 1);
   const t0 = performance.now();
   function frame(now) {
-    const t = now - t0;
+    const ms = now - t0;
     ctx.clearRect(0, 0, cv.width, cv.height);
-    letters.forEach((l, k) => {
-      const q = Math.min(1, Math.max(0, (t - k * gap) / TURN));
-      const a = (1 - q) ** 3 * Math.PI / 2;            // 90 degrees flat, 0 upright
-      const sin = Math.sin(a), cos = Math.cos(a);
-      const mid = Math.round(line / 2 / px) * px;       // pivot, from the letter's top
-      // draw the screen row at dy (from the letter's top); v = its height above the pivot
-      const row = (dy, v) => {
-        const s = v * far / (far * cos - v * sin);      // height on the letter, from the pivot
-        if (!(Math.abs(s) < mid) || s * v < 0) return false;
-        const dw = Math.round(cell * far / (far + s * sin) / px) * px;
-        const dx = l.x + Math.round((cell - dw) / 2 / px) * px;
-        const sy = l.y + Math.floor((mid - s) / px) * px;
-        ctx.drawImage(src, l.x, sy, cell, px, dx + pad, l.y + dy + pad, dw, px);
-        return true;
-      };
-      for (let u = 0; row(mid - px - u, u + px / 2); u += px);      // top half
-      for (let u = 0; row(mid + u, -(u + px / 2)); u += px);        // bottom half
-    });
-    if (t < RASTER_MS) {
+    draw(ctx, ms);
+    if (ms < RASTER_MS) {
       requestAnimationFrame(frame);
     } else {
       cv.remove();
@@ -287,6 +261,83 @@ function flipUp(h, done) {
     }
   }
   requestAnimationFrame(frame);
+}
+
+// Mode 7 style flip: each letter starts lying flat and turns up around its
+// middle to face you (top half tipped away, bottom half towards you), one
+// after another from the C to the last e. Drawn a row at a time; rows further
+// back are narrower, nearer ones wider. Pixels are only doubled or dropped
+// (no smoothing), so it stays as sharp as the font.
+function flipUp(h, done) {
+  const TURN = 400;                                     // ms for one letter
+  const px = textPixel();
+  const t = pinkTitle(h);
+  const { src, letters, cell, line } = t;
+  const pad = Math.ceil(cell / 2 / px) * px;            // the near half grows past its cell
+  const far = 3 * line;                                 // camera distance: perspective strength
+  const gap = (RASTER_MS - TURN) / Math.max(1, letters.length - 1);
+  const mid = Math.round(line / 2 / px) * px;           // pivot, from the letter's top
+  canvasIn(h, t, pad, (ctx, ms) => letters.forEach((l, k) => {
+    const q = Math.min(1, Math.max(0, (ms - k * gap) / TURN));
+    const a = (1 - q) ** 3 * Math.PI / 2;              // 90 degrees flat, 0 upright
+    const sin = Math.sin(a), cos = Math.cos(a);
+    // draw the screen row at dy (from the letter's top); v = its height above the pivot
+    const row = (dy, v) => {
+      const s = v * far / (far * cos - v * sin);        // height on the letter, from the pivot
+      if (!(Math.abs(s) < mid) || s * v < 0) return false;
+      const dw = Math.round(cell * far / (far + s * sin) / px) * px;
+      const dx = l.x + Math.round((cell - dw) / 2 / px) * px;
+      const sy = l.y + Math.floor((mid - s) / px) * px;
+      ctx.drawImage(src, l.x, sy, cell, px, dx + pad, l.y + dy + pad, dw, px);
+      return true;
+    };
+    for (let u = 0; row(mid - px - u, u + px / 2); u += px);        // top half
+    for (let u = 0; row(mid + u, -(u + px / 2)); u += px);          // bottom half
+  }), done);
+}
+
+// hop: the C pops up and bounces; as it lands the S jumps out from behind it
+// and hops down to its place, then the next letter jumps out of the S back up
+// to the top line, and so on, zig-zagging top, bottom, top, bottom.
+function hopIn(h, done) {
+  const BOUNCE = 260;                                   // ms of bouncing after a landing
+  const px = textPixel();
+  const t = pinkTitle(h);
+  const { src, cell, line } = t;
+  const order = [...t.letters].sort((a, b) => a.col - b.col || a.row - b.row);
+  const hop = (RASTER_MS - BOUNCE) / order.length;      // ms in the air; the next one leaves on landing
+  const pad = Math.ceil(line / 2 / px) * px;
+  const snap = (v) => Math.round(v / px) * px;
+  canvasIn(h, t, pad, (ctx, ms) => {
+    const at = order.map((l, k) => {
+      const air = (ms - k * hop) / hop;                // 0..1 in the air
+      if (air < 0) return null;
+      const from = order[k - 1] || l;                   // the C hops in place
+      let x = l.x, y = l.y;
+      if (air < 1) {
+        x = from.x + (l.x - from.x) * air;
+        y = from.y + (l.y - from.y) * air - line / 2 * 4 * air * (1 - air);
+      } else {
+        // two hops, each lower than the last
+        const b = Math.min(1, (ms - (k + 1) * hop) / BOUNCE);
+        y -= line / 4 * Math.abs(Math.sin(b * Math.PI * 2)) * (1 - b);
+      }
+      return { x: snap(x) + pad, y: snap(y) + pad, flying: air < 1 };
+    });
+    // the letter in the air goes behind every letter already out: where it
+    // overlaps one it is cut away, so it comes out from behind the last one
+    const fly = at.find((p) => p && p.flying);
+    for (let k = order.length - 1; k >= 0; k--) {
+      const p = at[k];
+      if (!p) continue;
+      if (fly && p !== fly) {
+        const x0 = Math.max(p.x, fly.x), y0 = Math.max(p.y, fly.y);
+        const x1 = Math.min(p.x, fly.x) + cell, y1 = Math.min(p.y, fly.y) + line;
+        if (x1 > x0 && y1 > y0) ctx.clearRect(x0, y0, x1 - x0, y1 - y0);
+      }
+      ctx.drawImage(src, order[k].x, order[k].y, cell, line, p.x, p.y, cell, line);
+    }
+  }, done);
 }
 
 // a shine over the title as it lands: a diagonal sweep turns the neon pink
