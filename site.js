@@ -205,10 +205,11 @@ function rowsIn(h, effect, done) {
   requestAnimationFrame(frame);
 }
 
-// Mode 7 style flip: each letter starts lying flat, tipped away from you, and
-// swings up on its bottom edge, one after another from the C to the last e.
-// Drawn on a canvas a row at a time; rows further back are narrower. Pixels
-// are only doubled or dropped (no smoothing), so it stays as sharp as the font.
+// Mode 7 style flip: each letter starts lying flat and turns up around its
+// middle to face you (top half tipped away, bottom half towards you), one
+// after another from the C to the last e. Drawn on a canvas a row at a time;
+// rows further back are narrower, nearer ones wider. Pixels are only doubled
+// or dropped (no smoothing), so it stays as sharp as the font.
 function flipUp(h, done) {
   const TURN = 400;                                     // ms for one letter
   const cs = getComputedStyle(h);
@@ -242,9 +243,12 @@ function flipUp(h, done) {
   }
   sc.putImageData(img, 0, 0);
 
+  // the near half of a letter grows past its cell, so the canvas gets a margin
+  const pad = Math.ceil(cell / 2 / px) * px;
   const cv = document.createElement("canvas");
-  cv.width = w;
-  cv.height = ht;
+  cv.width = w + 2 * pad;
+  cv.height = ht + 2 * pad;
+  cv.style.left = cv.style.top = `${-pad}px`;
   cv.className = "raster raster-canvas";
   cv.setAttribute("aria-hidden", "true");
   const ctx = cv.getContext("2d");
@@ -256,21 +260,24 @@ function flipUp(h, done) {
   const t0 = performance.now();
   function frame(now) {
     const t = now - t0;
-    ctx.clearRect(0, 0, w, ht);
+    ctx.clearRect(0, 0, cv.width, cv.height);
     letters.forEach((l, k) => {
       const q = Math.min(1, Math.max(0, (t - k * gap) / TURN));
       const a = (1 - q) ** 3 * Math.PI / 2;            // 90 degrees flat, 0 upright
       const sin = Math.sin(a), cos = Math.cos(a);
-      const bottom = l.y + line;
-      for (let u = 0; ; u += px) {
-        const v = u + px / 2;                           // screen height above the hinge
-        const s = v * far / (far * cos - v * sin);      // height on the letter
-        if (s < 0 || s >= line) break;
+      const mid = Math.round(line / 2 / px) * px;       // pivot, from the letter's top
+      // draw the screen row at dy (from the letter's top); v = its height above the pivot
+      const row = (dy, v) => {
+        const s = v * far / (far * cos - v * sin);      // height on the letter, from the pivot
+        if (!(Math.abs(s) < mid) || s * v < 0) return false;
         const dw = Math.round(cell * far / (far + s * sin) / px) * px;
         const dx = l.x + Math.round((cell - dw) / 2 / px) * px;
-        const sy = bottom - px - Math.floor(s / px) * px;
-        ctx.drawImage(src, l.x, sy, cell, px, dx, bottom - px - u, dw, px);
-      }
+        const sy = l.y + Math.floor((mid - s) / px) * px;
+        ctx.drawImage(src, l.x, sy, cell, px, dx + pad, l.y + dy + pad, dw, px);
+        return true;
+      };
+      for (let u = 0; row(mid - px - u, u + px / 2); u += px);      // top half
+      for (let u = 0; row(mid + u, -(u + px / 2)); u += px);        // bottom half
     });
     if (t < RASTER_MS) {
       requestAnimationFrame(frame);
