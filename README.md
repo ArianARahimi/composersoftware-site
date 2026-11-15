@@ -7,7 +7,8 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 - `site.js`: typing over the tagline on the home page (desktop only), closing the download window on a click outside it, clickable project windows, and starting the title intro
 - `intro/`: the home page title intros. `core.js` holds the shared parts, every other file is one effect.
   The home page downloads `core.js` and the one effect it picks; other pages download none of it.
-  A new effect is a new file (`INTROS.<name> = (heading, done) => ...`) plus its name in `INTRO_NAMES` in `site.js`.
+  `index.html` picks the effect in its first script and starts those downloads at once, next to `site.js`.
+  A new effect is a new file (`INTROS.<name> = (heading, done) => ...`) plus its name in that script's list.
 - `fonts/`: `Px437_IBM_VGA_8x16.woff2`, converted from the TTF in the
   [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) v2.2 by VileR
   (CC BY-SA 4.0, see `fonts/LICENSE.TXT`)

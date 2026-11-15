@@ -13,9 +13,33 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=71">
-<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro");</script>
-<script src="site.js?v=71" defer></script>
+<link rel="stylesheet" href="style.css?v=72">
+<script>
+// title intro (skipped for reduced motion): picked here, before the first paint,
+// so the title never flashes first and its files download alongside site.js,
+// which runs it. A new effect is a file in intro/ plus its name here.
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const names = ["flip", "hop", "sand", "laser", "blackhole", "print", "glitch", "interlace", "ripple", "squash"];
+  let last = "";
+  try { last = localStorage.getItem("intro-effect") || ""; } catch { /* no storage */ }
+  const choices = names.filter((n) => n !== last);
+  const pick = choices[Math.floor(Math.random() * choices.length)];
+  try { localStorage.setItem("intro-effect", pick); } catch { /* no storage */ }
+  document.documentElement.classList.add("intro");
+  document.documentElement.dataset.intro = pick;
+  // shared parts, then the effect: they download together and run in order
+  window.introReady = Promise.all(["core", pick].map((file) => new Promise((ok, fail) => {
+    const s = document.createElement("script");
+    s.src = "intro/" + file + ".js?v=72";
+    s.async = false;
+    s.onload = ok;
+    s.onerror = fail;
+    document.head.append(s);
+  })));
+  window.introReady.catch(() => {});                    // site.js handles a failure
+}
+</script>
+<script src="site.js?v=72" defer></script>
 </head>
 <body id="top">
 

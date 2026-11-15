@@ -123,46 +123,17 @@ for (const card of document.querySelectorAll(".card-link")) {
 }
 
 
-// home page title intro: one effect, picked at random on each visit (never
-// the same twice in a row). Only the home page fetches intro code: the shared
-// parts (intro/core.js) and the picked effect's file, downloaded together.
+// home page title intro: index.html picks the effect before the first paint
+// and starts downloading intro/core.js and the effect's file (introReady);
+// this runs it once those and the fonts are in.
 
 const title = document.querySelector(".hero h1");
-// <html class="intro"> is set by an inline script in index.html before the first
-// paint (skipped for reduced motion), so the plain title never flashes first
 const intro = document.documentElement.classList;
-const INTRO_NAMES = ["flip", "hop", "sand", "laser", "blackhole", "print", "glitch", "interlace", "ripple", "squash"];
-const scriptUrl = document.currentScript.src;
-
-function pickEffect() {
-  let last = "";
-  try { last = localStorage.getItem("intro-effect") || ""; } catch { /* no storage */ }
-  const choices = INTRO_NAMES.filter((n) => n !== last);
-  const name = choices[Math.floor(Math.random() * choices.length)];
-  try { localStorage.setItem("intro-effect", name); } catch { /* no storage */ }
-  return name;
-}
-
-// intro/<name>.js for each name, with this script's ?v= so a redeploy never
-// mixes old and new files; they download together and run in order
-function loadIntro(names) {
-  const v = new URL(scriptUrl).searchParams.get("v");
-  return Promise.all(names.map((name) => new Promise((ok, fail) => {
-    const s = document.createElement("script");
-    const url = new URL(`intro/${name}.js`, scriptUrl);
-    if (v) url.searchParams.set("v", v);
-    s.src = url;
-    s.async = false;
-    s.onload = ok;
-    s.onerror = fail;
-    document.head.append(s);
-  })));
-}
 
 if (title && intro.contains("intro")) {
-  const name = pickEffect();
+  const name = document.documentElement.dataset.intro;
   const reveal = () => intro.remove("intro");
-  loadIntro(["core", name])
+  (window.introReady || Promise.reject(new Error("no intro")))
     .then(() => Promise.all([document.fonts.ready, INTROS[name].chars && document.fonts.load('16px "IBM VGA"', INTROS[name].chars)]))
     .then(() => {
       if (!intro.contains("intro")) return;             // too late, the title is showing
