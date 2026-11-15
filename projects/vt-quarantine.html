@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Projects - Composer Software</title>
-<meta name="description" content="Projects by Composer Software.">
+<title>VirusTotal Quarantine - Composer Software</title>
+<meta name="description" content="VirusTotal Quarantine: every download checked on VirusTotal before it reaches your Downloads folder.">
 <meta name="color-scheme" content="dark">
 <meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
-<link rel="canonical" href="https://composersoftware.net/projects">
-<link rel="stylesheet" href="style.css?v=15">
-<script src="site.js?v=15" defer></script>
+<link rel="canonical" href="https://composersoftware.net/projects/vt-quarantine">
+<link rel="stylesheet" href="/style.css?v=16">
+<script src="/site.js?v=16" defer></script>
 </head>
 <body>
 
@@ -19,15 +19,16 @@
     <a class="brand" href="/">Composer Software</a>
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/projects" aria-current="page">Projects</a></li>
+      <li><a href="/projects/" aria-current="page">Projects</a></li>
     </ul>
   </nav>
 </header>
 
 <main>
-  <h1 class="page">Projects</h1>
-  <article class="win project" id="vt-quarantine">
-    <header class="win-bar"><h2>VirusTotal Quarantine</h2><span class="win-tag">RELEASED</span></header>
+  <p class="crumbs"><a href="/projects/">Projects</a> <span aria-hidden="true">&gt;</span> VirusTotal Quarantine</p>
+  <h1 class="page">VirusTotal Quarantine</h1>
+  <article class="win project">
+    <header class="win-bar"><h2>About</h2><span class="win-tag">RELEASED</span></header>
     <div class="win-body project-body">
       <div>
         <p class="lead">Every download checked on VirusTotal before it reaches your Downloads folder.</p>
@@ -45,7 +46,7 @@
           <dt>License:</dt><dd>MIT, free and open source</dd>
         </dl>
       </div>
-      <img class="shot" src="images/vt-quarantine-notifications.png" width="332" height="522"
+      <img class="shot" src="/images/vt-quarantine-notifications.png" width="332" height="522"
         alt="Notifications: a flagged setup.exe with Show report and Delete buttons, and a clean file moved to Downloads">
     </div>
     <div class="win-foot">
@@ -64,6 +65,19 @@
       </details>
       <a href="https://github.com/ArianARahimi/vt-quarantine">Source</a>
       <a href="https://github.com/ArianARahimi/vt-quarantine/blob/master/docs/GUIDE.md">Guide</a>
+    </div>
+  </article>
+
+  <article class="win wide-note">
+    <header class="win-bar"><h2>How it works</h2></header>
+    <div class="win-body">
+      <dl class="facts how">
+        <dt>Clean:</dt><dd>no engine flags it, so it moves to Downloads with a short note.</dd>
+        <dt>Flagged:</dt><dd>stays locked in quarantine. Show report, then Delete or Mark as safe.</dd>
+        <dt>Unknown:</dt><dd>programs are uploaded for a scan. Documents and archives ask first, since uploads can be seen by VirusTotal's paying users.</dd>
+        <dt>Saved elsewhere:</dt><dd>taken into quarantine at once, checked, and put back where you saved it.</dd>
+        <dt>Gaming:</dt><dd>while you play fullscreen, questions wait until you're done.</dd>
+      </dl>
     </div>
   </article>
 </main>

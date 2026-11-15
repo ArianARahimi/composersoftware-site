@@ -157,14 +157,14 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   justify-content: space-between;
   line-height: 1;
 }
-.win-bar h2 { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
+.win-bar h2, .win-title { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
 .win-x { padding: 0 4px; color: var(--text); background: var(--x); }
 .win-tag { padding: 0 8px; color: var(--bg); background: var(--green); }
 .win-body { flex: 1; padding: 24px 16px 20px; }
 .win-body p { margin-bottom: 16px; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 0 8px; }
-.facts dt { color: var(--yellow); }
-.facts dd { margin: 0; color: var(--text); }
+.facts dt, .facts .dt { color: var(--yellow); }
+.facts dd, .facts .dd { margin: 0; color: var(--text); }
 .win-foot { display: flex; align-items: flex-start; gap: 16px; padding: 0 16px 16px; }
 
 footer.site {
@@ -187,6 +187,21 @@ footer.site p + p { margin-top: 4px; }
 @media (max-width: 760px) {
   .project-body { grid-template-columns: 1fr; }
 }
+
+/* projects compendium: each card is one link to the project's page */
+.intro { margin-bottom: 40px; color: var(--grey); }
+a.card { color: var(--text); text-decoration: none; }
+a.card .win-body { display: block; }
+.card-line { display: block; margin-bottom: 16px; }
+.card .facts { display: grid; }
+.card .open { color: var(--bright-cyan); }
+a.card:hover, a.card:focus-visible { border-color: var(--bright-cyan); outline: none; background: var(--bg); }
+a.card:hover .open, a.card:focus-visible .open { color: var(--bg); background: var(--bright-cyan); }
+
+/* project pages */
+.crumbs { margin-bottom: 24px; color: var(--grey); }
+.wide-note { margin-bottom: 40px; }
+.how { row-gap: 8px; }
 
 /* phones */
 @media (max-width: 600px) {
