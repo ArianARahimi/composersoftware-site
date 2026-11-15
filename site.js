@@ -740,7 +740,7 @@ function blackholeIn(h, done) {
 // lock into the Cyrillic spelling one by one, hold (with one more burst),
 // scramble again and land on the pink title. The randomness is keyed to time,
 // not frames, so it runs the same on any refresh rate.
-const CYRILLIC = ["КОМПОСЕР", "СОФТВАРЕ"];
+const CYRILLIC = ["Компосер", "Софтваре"];
 
 function glitchIn(h, done) {
   const t = pinkTitle(h);
