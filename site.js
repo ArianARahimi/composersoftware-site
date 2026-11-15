@@ -145,7 +145,7 @@ const ROW_EFFECTS = {
 };
 
 // every effect: (heading, done) and calls done() once the plain title is back
-const EFFECTS = { flip: flipUp, hop: hopIn };
+const EFFECTS = { flip: flipUp, hop: hopIn, sand: sandIn };
 for (const [name, fn] of Object.entries(ROW_EFFECTS)) EFFECTS[name] = (h, done) => rowsIn(h, fn, done);
 
 function pickEffect() {
@@ -379,6 +379,41 @@ function hopIn(h, done) {
     for (const p of out) {
       const front = bouncing.filter((r) => !p.bouncing || r.k > p.k);
       show(p, (x, y) => front.some((r) => inHalo(r, x, y)), false);
+    }
+    ctx.fill();
+  }, done);
+}
+
+// sand: every font pixel of the title is a grain that falls from a line
+// above it, each starting at a random moment, timed so the last grain lands
+// as the effect ends
+function sandIn(h, done) {
+  const px = textPixel();
+  const t = pinkTitle(h);
+  const { src, cell, line } = t;
+  const fp = cell / 8;                                  // one font pixel: one grain
+  const top = -line;                                    // where grains start falling
+  const pad = Math.ceil(line / px) * px;
+  const fall = 450;                                     // ms to fall the full height
+  const g = 2 * (t.ht - top) / fall ** 2;               // gravity, pixels per ms squared
+  const lit = src.getContext("2d").getImageData(0, 0, t.w, t.ht).data;
+  const grains = [];
+  for (let y = 0; y < t.ht; y += fp) {
+    for (let x = 0; x < t.w; x += fp) {
+      const c = ((y + fp / 2 | 0) * t.w + (x + fp / 2 | 0)) * 4 + 3;
+      if (!lit[c]) continue;
+      const drop = Math.sqrt(2 * (y - top) / g);       // ms this grain is in the air
+      grains.push({ x, y, start: Math.random() * (RASTER_MS - drop), drop });
+    }
+  }
+  canvasIn(h, t, pad, (ctx, ms) => {
+    ctx.fillStyle = t.pink;
+    ctx.beginPath();
+    for (const q of grains) {
+      const a = ms - q.start;
+      if (a < 0) continue;
+      const y = a >= q.drop ? q.y : Math.round((top + g * a * a / 2) / px) * px;
+      ctx.rect(q.x + pad, y + pad, fp, fp);
     }
     ctx.fill();
   }, done);
