@@ -746,7 +746,7 @@ function glitchIn(h, done) {
   const t = pinkTitle(h);
   const { src, cell, line } = t;
   const fp = cell / 8;                                  // one font pixel
-  const pad = Math.ceil(line / fp) * fp;
+  const pad = Math.ceil(cell / 2 / fp) * fp;           // room for tears and fringes only
   const W = t.w + 2 * pad, H = t.ht + 2 * pad;
   const CHARS = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&@*+=<>?/\\|~^!ЖЯЮФШЩДЛБЭЙЦ░▒▓█▀▄▌▐■☺☻♥♦♣♠•◘○◙♪♫☼►◄‼¶§↨↑↓→←↔▲▼αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤÷≈√²"];
   const HOT = ["#ffffff", "#55ffff", "#ff55ff", "#c8ff00", t.pink];
@@ -793,12 +793,12 @@ function glitchIn(h, done) {
     b.clearRect(0, 0, W, H);
     const w = wild(ms);
 
-    // strays: random characters all over, a new batch every 60ms
+    // strays: random characters over the title, a new batch every 60ms
     const batch = Math.floor(ms / 60);
-    for (let i = 0, n = Math.round(16 * w); i < n; i++) {
+    for (let i = 0, n = Math.round(10 * w); i < n; i++) {
       const s = batch * 64 + i;
       b.drawImage(glyph(t, pick(CHARS, s, 4), pick(rnd(s, 5) < 0.5 ? HOT : DIM, s, 6)),
-        snap(rnd(s, 7) * (W - cell)), snap(rnd(s, 8) * (H - line)));
+        pad + snap(rnd(s, 7) * (t.w - cell)), pad + snap(rnd(s, 8) * (t.ht - line)));
     }
 
     // the letters
@@ -827,7 +827,7 @@ function glitchIn(h, done) {
     const tear = Math.floor(ms / 50);
     for (let y = 0, i = 0; y < H; i++) {
       const bh = Math.min(H - y, snap(between(rnd(tear * 128 + i, 12), 1, 6) * fp) || fp);
-      const shift = rnd(tear * 128 + i, 13) < 0.35 * w ? snap((rnd(tear * 128 + i, 14) - 0.5) * 4 * cell * w) : 0;
+      const shift = rnd(tear * 128 + i, 13) < 0.35 * w ? snap((rnd(tear * 128 + i, 14) - 0.5) * cell * w) : 0;
       ctx.drawImage(buf, 0, y, W, bh, shift, y, W, bh);
       y += bh;
     }
