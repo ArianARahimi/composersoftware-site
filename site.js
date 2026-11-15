@@ -138,9 +138,9 @@ const EFFECTS = {
   // neighbouring rows swing in opposite directions
   interlace: (i, r, p, big) => ({ x: (i % 2 ? 1 : -1) * 24 * big * (1 - p) ** 2 * Math.cos(r * 0.35 - p * 16) }),
   // all rows sway together in a travelling wave, like a flag
-  ripple: (_i, r, p, big) => ({ x: 16 * big * (1 - p) ** 2 * Math.sin(r * 0.25 - p * 14) }),
+  ripple: (_i, r, p, big) => ({ x: 36 * big * (1 - p) ** 2 * Math.sin(r * 0.25 - p * 14) }),
   // rows bunch up and stretch vertically
-  squash: (_i, r, p, big) => ({ y: 4 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12) }),
+  squash: (_i, r, p, big) => ({ y: 10 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12) }),
 };
 
 function pickEffect() {
