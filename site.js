@@ -202,7 +202,7 @@ function sheen(h) {
   // two sweeps along the same "/" diagonal (the bottom row runs one letter
   // ahead of the row above): the first turns each letter white, the second,
   // right after, turns it yellow
-  const STEP = 18;
+  const STEP = 10;
   const longest = Math.max(...lines.map((l) => l.length));
   const pass = (longest + lines.length - 1) * STEP;     // one full sweep
   const hold = pass + 60;                               // white until the second sweep
