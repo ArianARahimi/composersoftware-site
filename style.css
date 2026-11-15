@@ -252,8 +252,8 @@ code { font: inherit; color: var(--yellow); }
 
 /* home title raster slide-in (site.js) */
 .hero h1 { position: relative; }
-/* hidden until the intro starts (html.intro, see site.js); shown after 4s anyway if site.js never runs */
-.intro .hero h1 { color: transparent; animation: intro-fallback 0s 4s forwards; }
+/* hidden until the intro starts (html.intro, see site.js); shown after 3s anyway if site.js never runs */
+.intro .hero h1 { color: transparent; animation: intro-fallback 0s 3s forwards; }
 @keyframes intro-fallback { to { color: var(--yellow); } }
 .raster { position: absolute; inset: 0; pointer-events: none; }
 .raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }

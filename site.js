@@ -280,9 +280,9 @@ function glyph(t, ch, colour) {
 }
 
 // runs draw(ctx, ms) on a canvas over the title, `pad` pixels bigger on
-// every side, for `length` ms; then removes it and calls done(). If drawing
+// every side, for RASTER_MS; then removes it and calls done(). If drawing
 // ever fails, it stops at once, so the title is never left hidden
-function canvasIn(h, t, pad, draw, done, length = RASTER_MS) {
+function canvasIn(h, t, pad, draw, done) {
   const cv = document.createElement("canvas");
   cv.width = t.w + 2 * pad;
   cv.height = t.ht + 2 * pad;
@@ -303,7 +303,7 @@ function canvasIn(h, t, pad, draw, done, length = RASTER_MS) {
       ok = false;
       console.error(e);
     }
-    if (ok && ms < length) {
+    if (ok && ms < RASTER_MS) {
       requestAnimationFrame(frame);
     } else {
       cv.remove();
@@ -741,7 +741,6 @@ function blackholeIn(h, done) {
 // scramble again and land on the pink title. The randomness is keyed to time,
 // not frames, so it runs the same on any refresh rate.
 const CYRILLIC = ["КОМПОСЕР", "СОФТВАРЕ"];
-const GLITCH_MS = 1800;
 
 function glitchIn(h, done) {
   const t = pinkTitle(h);
@@ -753,7 +752,8 @@ function glitchIn(h, done) {
   const HOT = ["#ffffff", "#55ffff", "#ff55ff", t.pink];
   const DIM = ["#555555", "#aaaaaa", "#00aaaa", "#aa00aa"];
   // timeline, ms
-  const CYR_FROM = 300, CYR_TO = 700, BURST = 930, BURST_MS = 70, LAT_FROM = 1150, LAT_TO = 1550, SCRAMBLE = 110;
+  const CALM_FROM = 350, CALM_TO = 600, CYR_FROM = 200, CYR_TO = 480, BURST = 640, BURST_MS = 50;
+  const LAT_FROM = 820, LAT_TO = 1150, SCRAMBLE = 90;
 
   // a random number 0..1 for (a, b), the same every time it is asked
   const seed = Math.random() * 2 ** 32 | 0;
@@ -777,8 +777,8 @@ function glitchIn(h, done) {
   // how wild it is: strays and tears, full at first, calm while the Cyrillic
   // holds, a smaller wave while the letters change back
   const wild = (ms) => {
-    if (ms < 500) return 1;
-    if (ms < 900) return 1 - (ms - 500) / 400;
+    if (ms < CALM_FROM) return 1;
+    if (ms < CALM_TO) return 1 - (ms - CALM_FROM) / (CALM_TO - CALM_FROM);
     if (burst(ms)) return 0.8;
     if (ms >= LAT_FROM - 50 && ms < LAT_TO) return 0.4 * Math.sin((ms - LAT_FROM + 50) / (LAT_TO - LAT_FROM + 50) * Math.PI);
     return 0;
@@ -831,7 +831,7 @@ function glitchIn(h, done) {
       ctx.drawImage(buf, 0, y, W, bh, shift, y, W, bh);
       y += bh;
     }
-  }, done, GLITCH_MS);
+  }, done);
 }
 
 // 8-connected groups of set cells in a w x h grid, as lists of indices
