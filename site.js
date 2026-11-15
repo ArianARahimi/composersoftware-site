@@ -192,7 +192,7 @@ function rowsIn(h, effect, done) {
   const snap = (v) => Math.round((v || 0) / px) * px;
   const t0 = performance.now();
   function frame(now) {
-    const p = Math.min(1, (now - t0) / RASTER_MS);
+    const p = Math.min(1, Math.max(0, now - t0) / RASTER_MS);   // a frame's time can be just before t0
     rows.forEach((row, i) => {
       const f = effect(i, i * px / big, p, big, phase);
       row.style.transform = `translate(${snap(f.x)}px, ${snap(f.y)}px)`;
@@ -238,8 +238,9 @@ function pinkTitle(h) {
   return { src, letters, cell, line, w, ht, pink };
 }
 
-// runs draw(ctx, ms, pad) on a canvas over the title, `pad` pixels bigger on
-// every side, for RASTER_MS; then removes it and calls done()
+// runs draw(ctx, ms) on a canvas over the title, `pad` pixels bigger on
+// every side, for RASTER_MS; then removes it and calls done(). If drawing
+// ever fails, it stops at once, so the title is never left hidden
 function canvasIn(h, t, pad, draw, done) {
   const cv = document.createElement("canvas");
   cv.width = t.w + 2 * pad;
@@ -252,10 +253,16 @@ function canvasIn(h, t, pad, draw, done) {
   h.append(cv);
   const t0 = performance.now();
   function frame(now) {
-    const ms = now - t0;
+    const ms = Math.max(0, now - t0);                  // a frame's time can be just before t0
     ctx.clearRect(0, 0, cv.width, cv.height);
-    draw(ctx, ms);
-    if (ms < RASTER_MS) {
+    let ok = true;
+    try {
+      draw(ctx, ms);
+    } catch (e) {
+      ok = false;
+      console.error(e);
+    }
+    if (ok && ms < RASTER_MS) {
       requestAnimationFrame(frame);
     } else {
       cv.remove();
