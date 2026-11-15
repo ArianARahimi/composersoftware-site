@@ -147,7 +147,7 @@ const ROW_EFFECTS = {
 };
 
 // every effect: (heading, done) and calls done() once the plain title is back
-const EFFECTS = { flip: flipUp, hop: hopIn, sand: sandIn };
+const EFFECTS = { flip: flipUp, hop: hopIn, sand: sandIn, laser: laserIn };
 for (const [name, fn] of Object.entries(ROW_EFFECTS)) EFFECTS[name] = (h, done) => rowsIn(h, fn, done);
 
 function pickEffect() {
@@ -421,6 +421,117 @@ function sandIn(h, done) {
       ctx.rect(q.x + pad, y + pad, px, px);
     }
     ctx.fill();
+  }, done);
+}
+
+// laser: one beam from above right etches the title a font pixel at a time,
+// wandering along the strokes (a random walk that backs up when it gets
+// stuck, letters in reading order). Each pixel glows hot and cools to pink,
+// and throws a one-pixel spark that falls and cools out.
+function laserIn(h, done) {
+  const px = textPixel();
+  const t = pinkTitle(h);
+  const { src, cell, line } = t;
+  const fp = cell / 8;                                  // one font pixel
+  const pad = Math.ceil(line / px) * px;
+  const BEAM = "#55ffff";
+  const COOL = [[0, "#ffffff"], [30, "#ffff55"], [80, "#ffa040"], [130, t.pink]];   // ms after etching
+  const SPARK = [[0, "#ffffff"], [60, "#ffff55"], [140, "#ffa040"], [220, "#aa0000"]];
+  const SPARK_MS = 300;                                 // a spark's life
+  const G = 0.0008;                                     // gravity, pixels per ms squared
+  const colourAt = (stops, age) => stops.reduce((c, [from, col]) => (age >= from ? col : c), stops[0][1]);
+  const snap = (v) => Math.round(v / px) * px;
+
+  // the lit font pixels, in reading order: line, letter, then top to bottom
+  const gw = Math.floor(t.w / fp), gh = Math.floor(t.ht / fp);
+  const data = src.getContext("2d").getImageData(0, 0, t.w, t.ht).data;
+  const lit = new Uint8Array(gw * gh);
+  const order = [];
+  for (let gy = 0; gy < gh; gy++) {
+    for (let gx = 0; gx < gw; gx++) {
+      if (!data[((gy * fp + (fp >> 1)) * t.w + gx * fp + (fp >> 1)) * 4 + 3]) continue;
+      lit[gy * gw + gx] = 1;
+      order.push(gy * gw + gx);
+    }
+  }
+  const key = (i) => {
+    const gx = i % gw, gy = (i - gx) / gw;
+    return [Math.floor(gy * fp / line), Math.floor(gx * fp / cell), gy, gx];
+  };
+  order.sort((a, b) => {
+    const ka = key(a), kb = key(b);
+    return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2] || ka[3] - kb[3];
+  });
+
+  // the laser's path: from each letter's first pixel, step to a random unetched
+  // neighbour; with none left, back up to the last pixel that has one
+  const seen = new Uint8Array(gw * gh);
+  const path = [];
+  for (const first of order) {
+    if (seen[first]) continue;
+    seen[first] = 1;
+    path.push(first);
+    const stack = [first];
+    while (stack.length) {
+      const c = stack[stack.length - 1], cx = c % gw, cy = (c - cx) / gw;
+      const next = [];
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = cx + dx, ny = cy + dy, n = ny * gw + nx;
+          if ((dx || dy) && nx >= 0 && nx < gw && ny >= 0 && ny < gh && lit[n] && !seen[n]) next.push(n);
+        }
+      }
+      if (!next.length) {
+        stack.pop();
+        continue;
+      }
+      const n = next[Math.floor(Math.random() * next.length)];
+      seen[n] = 1;
+      path.push(n);
+      stack.push(n);
+    }
+  }
+
+  const etchEnd = RASTER_MS - COOL[COOL.length - 1][0] - 20;   // the last pixel is pink before the end
+  const step = etchEnd / path.length;
+  const dots = path.map((c, i) => {
+    const gx = c % gw, gy = (c - gx) / gw;
+    return {
+      x: gx * fp + pad, y: gy * fp + pad, at: i * step,
+      vx: (Math.random() - 0.5) * 0.2, vy: -Math.random() * 0.12,          // spark throw, px per ms
+      life: Math.min(SPARK_MS, RASTER_MS - 40 - i * step),                  // late sparks cool faster, all out before the end
+    };
+  });
+  const mount = { x: t.w + 2 * pad - px, y: 0 };
+
+  canvasIn(h, t, pad, (ctx, ms) => {
+    const n = Math.min(dots.length, Math.floor(ms / step) + 1);
+    const paths = new Map();
+    const add = (colour, x, y, size) => {
+      let p = paths.get(colour);
+      if (!p) paths.set(colour, (p = new Path2D()));
+      p.rect(x, y, size, size);
+    };
+    for (let i = 0; i < n; i++) {
+      const d = dots[i], age = ms - d.at;
+      add(colourAt(COOL, age), d.x, d.y, fp);
+      if (age < d.life) {
+        const sx = d.x + fp / 2 + d.vx * age, sy = d.y + fp / 2 + d.vy * age + G * age * age / 2;
+        add(colourAt(SPARK, age / d.life * SPARK_MS), snap(sx), snap(sy), px);
+      }
+    }
+    if (ms < etchEnd) {
+      // the beam: one pixel wide, from the mount to the newest etched pixel
+      const d = dots[n - 1], ex = d.x + fp / 2, ey = d.y + fp / 2;
+      const len = Math.max(Math.abs(ex - mount.x), Math.abs(ey - mount.y)) / px;
+      for (let s = 0; s <= len; s++) {
+        add(BEAM, snap(mount.x + (ex - mount.x) * s / len), snap(mount.y + (ey - mount.y) * s / len), px);
+      }
+    }
+    for (const [colour, p] of paths) {
+      ctx.fillStyle = colour;
+      ctx.fill(p);
+    }
   }, done);
 }
 
