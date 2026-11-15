@@ -233,7 +233,7 @@ function pinkTitle(h) {
     img.data.set(img.data[i + 3] > 127 ? [...rgb, 255] : [0, 0, 0, 0], i);
   }
   sc.putImageData(img, 0, 0);
-  return { src, letters, cell, line, w, ht };
+  return { src, letters, cell, line, w, ht, pink };
 }
 
 // runs draw(ctx, ms, pad) on a canvas over the title, `pad` pixels bigger on
@@ -308,6 +308,17 @@ function hopIn(h, done) {
   const hop = (RASTER_MS - BOUNCE) / order.length;      // ms in the air; the next one leaves on landing
   const pad = Math.ceil(line / 2 / px) * px;
   const snap = (v) => Math.round(v / px) * px;
+  // each letter's lit pixels, relative to its cell
+  const lit = src.getContext("2d").getImageData(0, 0, t.w, t.ht).data;
+  const dots = order.map((l) => {
+    const d = [];
+    for (let y = 0; y < line; y++) {
+      for (let x = 0; x < cell; x++) if (lit[((l.y + y) * t.w + l.x + x) * 4 + 3]) d.push([x, y]);
+    }
+    return d;
+  });
+  const inside = (r, x, y) => x >= r.x && x < r.x + cell && y >= r.y && y < r.y + line;
+  const minPiece = 4 * (cell / 8) ** 2;                 // 4 font pixels
   canvasIn(h, t, pad, (ctx, ms) => {
     const at = order.map((l, k) => {
       const air = (ms - k * hop) / hop;                // 0..1 in the air
@@ -322,22 +333,51 @@ function hopIn(h, done) {
         const b = Math.min(1, (ms - (k + 1) * hop) / BOUNCE);
         y -= line / 4 * Math.abs(Math.sin(b * Math.PI * 2)) * (1 - b);
       }
-      return { x: snap(x) + pad, y: snap(y) + pad, flying: air < 1 };
+      return { x: snap(x) + pad, y: snap(y) + pad, flying: air < 1, k };
     });
-    // the letter in the air goes behind every letter already out: where it
-    // overlaps one it is cut away, so it comes out from behind the last one
+    // landed letters as they are; the one in the air goes behind them. It is
+    // drawn pixel by pixel: only what is out in the open, minus pieces under
+    // 4 font pixels (slivers cut off by a letter's edge), and only once a
+    // third of it shows, so no stray pixels flash
     const fly = at.find((p) => p && p.flying);
-    for (let k = order.length - 1; k >= 0; k--) {
-      const p = at[k];
-      if (!p) continue;
-      if (fly && p !== fly) {
-        const x0 = Math.max(p.x, fly.x), y0 = Math.max(p.y, fly.y);
-        const x1 = Math.min(p.x, fly.x) + cell, y1 = Math.min(p.y, fly.y) + line;
-        if (x1 > x0 && y1 > y0) ctx.clearRect(x0, y0, x1 - x0, y1 - y0);
-      }
-      ctx.drawImage(src, order[k].x, order[k].y, cell, line, p.x, p.y, cell, line);
+    const out = at.filter((p) => p && p !== fly);
+    for (const p of out) ctx.drawImage(src, order[p.k].x, order[p.k].y, cell, line, p.x, p.y, cell, line);
+    if (!fly) return;
+    const open = new Uint8Array(cell * line);
+    for (const [x, y] of dots[fly.k]) {
+      if (!out.some((r) => inside(r, fly.x + x, fly.y + y))) open[y * cell + x] = 1;
     }
+    const shown = pieces(open, cell, line).filter((q) => q.length >= minPiece).flat();
+    if (shown.length * 3 < dots[fly.k].length) return;
+    ctx.fillStyle = t.pink;
+    for (const i of shown) ctx.fillRect(fly.x + i % cell, fly.y + Math.floor(i / cell), 1, 1);
   }, done);
+}
+
+// 8-connected groups of set cells in a w x h grid, as lists of indices
+function pieces(grid, w, h) {
+  const seen = new Uint8Array(grid.length);
+  const groups = [];
+  for (let i = 0; i < grid.length; i++) {
+    if (!grid[i] || seen[i]) continue;
+    const group = [], stack = [i];
+    seen[i] = 1;
+    while (stack.length) {
+      const j = stack.pop(), x = j % w, y = (j - x) / w;
+      group.push(j);
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx, ny = y + dy, n = ny * w + nx;
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h && grid[n] && !seen[n]) {
+            seen[n] = 1;
+            stack.push(n);
+          }
+        }
+      }
+    }
+    groups.push(group);
+  }
+  return groups;
 }
 
 // a shine over the title as it lands: a diagonal sweep turns the neon pink
