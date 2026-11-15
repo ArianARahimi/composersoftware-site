@@ -129,7 +129,9 @@ for (const card of document.querySelectorAll(".card-link")) {
 // positions snap to whole pixels.
 
 const title = document.querySelector(".hero h1");
-const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// <html class="intro"> is set by an inline script in index.html before the first
+// paint (skipped for reduced motion), so the plain title never flashes first
+const intro = document.documentElement.classList;
 const RASTER_MS = 1300;
 
 // row effects: (row index, row position in title pixels, progress 0..1,
@@ -160,7 +162,7 @@ function pickEffect() {
 
 function rasterIn(h) {
   EFFECTS[pickEffect()](h, () => {
-    h.classList.remove("raster-wait");
+    intro.remove("intro");
     sheen(h);
   });
 }
@@ -475,10 +477,9 @@ function sheen(h) {
   });
 }
 
-if (title && !calm) {
-  title.classList.add("raster-wait");
-  const start = () => { if (title.classList.contains("raster-wait") && !title.querySelector(".raster")) rasterIn(title); };
+if (title && intro.contains("intro")) {
+  const start = () => { if (intro.contains("intro") && !title.querySelector(".raster")) rasterIn(title); };
   document.fonts.ready.then(start);
   // never leave the title hidden if fonts are slow
-  setTimeout(() => { if (!title.querySelector(".raster")) title.classList.remove("raster-wait"); }, 1500);
+  setTimeout(() => { if (!title.querySelector(".raster")) intro.remove("intro"); }, 1500);
 }
