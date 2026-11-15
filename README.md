@@ -4,7 +4,10 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 
 - `index.html`, `projects.html`, `404.html`: pages, each with the same header and footer
 - `style.css`: styles, ZealOS colors at the top
-- `site.js`: typing over the tagline on the home page (desktop only), and closing the download window on a click outside it
+- `site.js`: typing over the tagline on the home page (desktop only), closing the download window on a click outside it, clickable project windows, and starting the title intro
+- `intro/`: the home page title intros. `core.js` holds the shared parts, every other file is one effect.
+  The home page downloads `core.js` and the one effect it picks; other pages download none of it.
+  A new effect is a new file (`INTROS.<name> = (heading, done) => ...`) plus its name in `INTRO_NAMES` in `site.js`.
 - `fonts/`: `Px437_IBM_VGA_8x16.woff2`, converted from the TTF in the
   [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) v2.2 by VileR
   (CC BY-SA 4.0, see `fonts/LICENSE.TXT`)
@@ -16,7 +19,7 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 Links use clean addresses (`/projects`, not `projects.html`). GitHub Pages serves
 those; a local preview server may need the `.html` typed in.
 
-When `style.css` or `site.js` changes, raise the `?v=` number in the HTML files
+When `style.css`, `site.js` or anything in `intro/` changes, raise the `?v=` number in the HTML files
 so browsers don't mix a cached old file with the new pages.
 
 ## Projects

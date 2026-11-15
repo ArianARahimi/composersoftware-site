@@ -37,7 +37,8 @@
   --green: #55ff55;
   --magenta: #ff55ff;
   --pink: #ff2d95; /* neon pink, only for the title intro */
-  --x: #a24444;
+  --dark-grey: #555555;
+  --red: #aa0000;
   --width: 992px; /* 960px of content plus the side padding */
   --card: 304px;
 }
@@ -72,7 +73,7 @@ a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 /* centered on whole pixels so the pixel font stays sharp */
 .top nav, main, footer.site {
   max-width: var(--width);
-  margin-left: auto;
+  margin-left: auto;                  /* for browsers without round() */
   margin-right: auto;
   margin-left: max(0px, round(down, (100% - var(--width)) / 2, 1px));
   padding-left: 16px;
@@ -94,14 +95,13 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 /* hero */
 .hero { display: flex; gap: 32px; margin-bottom: 80px; }
 .hero-text { flex: none; }
-.hero h1 { font-size: 48px; line-height: 1; color: var(--yellow); letter-spacing: 0; }
+.hero h1 { position: relative; font-size: 48px; line-height: 1; color: var(--yellow); }
 .prompt { margin-top: 24px; }
 .path { color: var(--grey); }
 .cursor {
   display: inline-block;
   width: 8px;
   height: 16px;
-  margin-left: 0;
   vertical-align: -3px;
   background: var(--yellow);
   animation: blink 1s steps(1) 2.2s infinite;
@@ -147,6 +147,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 
 .section, .page { margin-bottom: 32px; color: var(--yellow); }
 .page { font-size: 32px; line-height: 1; }
+.blurb { margin-bottom: 40px; color: var(--grey); }
 
 /* cards: fixed widths so text stays on whole pixels */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
@@ -169,14 +170,14 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   justify-content: space-between;
   line-height: 1;
 }
-.win-bar h2, .win-title { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
-.win-x { padding: 0 4px; color: var(--text); background: var(--x); }
+.win-bar h2 { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
 .win-tag { padding: 0 8px; color: var(--bg); background: var(--green); }
+.win-tag.wip { background: var(--magenta); }
 .win-body { flex: 1; padding: 24px 16px 20px; }
 .win-body p { margin-bottom: 16px; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 0 8px; }
-.facts dt, .facts .dt { color: var(--yellow); }
-.facts dd, .facts .dd { margin: 0; color: var(--text); }
+.facts dt { color: var(--yellow); }
+.facts dd { margin: 0; color: var(--text); }
 .win-foot { display: flex; align-items: flex-start; gap: 16px; padding: 0 16px 16px; }
 
 footer.site {
@@ -201,7 +202,6 @@ footer.site p + p { margin-top: 4px; }
 }
 
 /* project windows: the whole window opens the project page (site.js) */
-.intro { margin-bottom: 40px; color: var(--grey); }
 .card-title { color: inherit; text-decoration: none; }
 .card-title:hover { color: inherit; background: none; }
 .card-link.hot { border-color: var(--yellow); cursor: pointer; }
@@ -213,7 +213,6 @@ footer.site p + p { margin-top: 4px; }
 /* Download and Source: invisible extra click area around each */
 .win-foot > a, .download summary { position: relative; }
 .win-foot > a::before, .download summary::before { content: ""; position: absolute; inset: -12px -8px; }
-.win-tag.wip { background: var(--magenta); }
 .dim { color: var(--dim); }
 
 /* project pages */
@@ -250,15 +249,14 @@ code { font: inherit; color: var(--yellow); }
 .get-latest { margin-top: 28px; }
 .get-note { margin-top: 12px; max-width: 40ch; color: var(--text); }
 
-/* home title raster slide-in (site.js) */
-.hero h1 { position: relative; }
+/* home title intro (site.js, intro/) */
 /* hidden until the intro starts (html.intro, see site.js); shown after 3s anyway if site.js never runs */
 .intro .hero h1 { color: transparent; animation: intro-fallback 0s 3s forwards; }
 @keyframes intro-fallback { to { color: var(--yellow); } }
 .raster { position: absolute; inset: 0; pointer-events: none; }
 .raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }
 .raster-canvas { inset: 0 auto auto 0; image-rendering: pixelated; }
-/* the shine: pink, then white from the first sweep, yellow from the second (timing set in site.js) */
+/* the shine: pink, then white from the first sweep, yellow from the second (timing set in intro/core.js) */
 .sheen-ch { animation-name: sheen-ch; animation-fill-mode: both; }
 @keyframes sheen-ch { 0% { color: var(--pink); } 0.1%, 99.9% { color: var(--text); } 100% { color: var(--yellow); } }
 
@@ -303,7 +301,7 @@ code { font: inherit; color: var(--yellow); }
   position: absolute;
   inset: 12px -12px -12px 12px;
   z-index: -1;
-  background: repeating-conic-gradient(#555555 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+  background: repeating-conic-gradient(var(--dark-grey) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
 }
 .dos-title {
   position: absolute;
@@ -328,9 +326,9 @@ code { font: inherit; color: var(--yellow); }
   text-decoration: none;
 }
 .dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); background: var(--dark-blue); outline: none; }
-.dos-menu .key { color: #aa0000; }
+.dos-menu .key { color: var(--red); }
 .dos-menu a:hover .key, .dos-menu a:focus-visible .key { color: var(--text); }
-.dos-menu .note { color: #555555; }
+.dos-menu .note { color: var(--dark-grey); }
 .dos-menu a:hover .note, .dos-menu a:focus-visible .note { color: var(--grey); }
 
 /* icons: 32x32 pixel art shown 1:1 so its pixels match the font's.
