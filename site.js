@@ -121,3 +121,49 @@ for (const card of document.querySelectorAll(".card-link")) {
     else location.href = card.dataset.href;
   });
 }
+
+// home page title: a Game Boy style raster slide-in. The title is cut into
+// rows one font pixel tall; even rows slide in from the left, odd rows from
+// the right, each a little earlier or later along a sine wave.
+
+const title = document.querySelector(".hero h1");
+const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function rasterIn(h) {
+  const px = parseFloat(getComputedStyle(h).fontSize) / 16;
+  const height = Math.round(h.getBoundingClientRect().height);
+  const rows = Math.ceil(height / px);
+  // each side starts just off its own edge of the screen, so both enter at once
+  const range = document.createRange();
+  range.selectNodeContents(h);
+  const text = range.getBoundingClientRect();
+  const fromLeft = -Math.ceil(text.right + 16);
+  const fromRight = Math.ceil(window.innerWidth - text.left + 16);
+  const box = document.createElement("div");
+  box.className = "raster";
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < rows; i++) {
+    const row = document.createElement("div");
+    row.className = "raster-row";
+    row.innerHTML = h.innerHTML;
+    row.style.clipPath = `inset(${i * px}px 0 ${Math.max(0, height - (i + 1) * px)}px 0)`;
+    row.style.setProperty("--from", (i % 2 ? fromRight : fromLeft) + "px");
+    row.style.animationDelay = Math.round(130 + 120 * Math.sin((i / rows) * Math.PI * 3)) + "ms";
+    box.append(row);
+  }
+  h.append(box);
+  let left = rows;
+  box.addEventListener("animationend", () => {
+    if (--left > 0) return;
+    box.remove();
+    h.classList.remove("raster-wait");
+  });
+}
+
+if (title && !calm) {
+  title.classList.add("raster-wait");
+  const start = () => { if (title.classList.contains("raster-wait") && !title.querySelector(".raster")) rasterIn(title); };
+  document.fonts.ready.then(start);
+  // never leave the title hidden if fonts are slow
+  setTimeout(() => { if (!title.querySelector(".raster")) title.classList.remove("raster-wait"); }, 1500);
+}
