@@ -147,7 +147,7 @@ const ROW_EFFECTS = {
 };
 
 // every effect: (heading, done) and calls done() once the plain title is back
-const EFFECTS = { flip: flipUp, hop: hopIn, sand: sandIn, laser: laserIn, blackhole: blackholeIn, print: printIn };
+const EFFECTS = { flip: flipUp, hop: hopIn, sand: sandIn, laser: laserIn, blackhole: blackholeIn, print: printIn, glitch: glitchIn };
 for (const [name, fn] of Object.entries(ROW_EFFECTS)) EFFECTS[name] = (h, done) => rowsIn(h, fn, done);
 
 function pickEffect() {
@@ -258,13 +258,31 @@ function pinkTitle(h) {
     img.data.set(img.data[i + 3] > 127 ? lit : [0, 0, 0, 0], i);
   }
   sc.putImageData(img, 0, 0);
-  return { src, letters, cell, line, w, ht, pink, font: sc.font, base };
+  return { src, letters, cell, line, w, ht, pink, font: sc.font, base, sprites: new Map() };
+}
+
+// one character of the title font in one colour, whole font pixels only (cached)
+function glyph(t, ch, colour) {
+  const key = ch + colour;
+  let c = t.sprites.get(key);
+  if (c) return c;
+  c = document.createElement("canvas");
+  c.width = Math.ceil(t.cell);
+  c.height = Math.ceil(t.line);
+  const g = c.getContext("2d");
+  g.font = t.font;
+  g.fillText(ch, 0, t.base);
+  const img = g.getImageData(0, 0, c.width, c.height), on = [...rgb(colour), 255];
+  for (let i = 0; i < img.data.length; i += 4) img.data.set(img.data[i + 3] > 127 ? on : [0, 0, 0, 0], i);
+  g.putImageData(img, 0, 0);
+  t.sprites.set(key, c);
+  return c;
 }
 
 // runs draw(ctx, ms) on a canvas over the title, `pad` pixels bigger on
-// every side, for RASTER_MS; then removes it and calls done(). If drawing
+// every side, for `length` ms; then removes it and calls done(). If drawing
 // ever fails, it stops at once, so the title is never left hidden
-function canvasIn(h, t, pad, draw, done) {
+function canvasIn(h, t, pad, draw, done, length = RASTER_MS) {
   const cv = document.createElement("canvas");
   cv.width = t.w + 2 * pad;
   cv.height = t.ht + 2 * pad;
@@ -285,7 +303,7 @@ function canvasIn(h, t, pad, draw, done) {
       ok = false;
       console.error(e);
     }
-    if (ok && ms < RASTER_MS) {
+    if (ok && ms < length) {
       requestAnimationFrame(frame);
     } else {
       cv.remove();
@@ -563,21 +581,8 @@ function printIn(h, done) {
   const inOutSine = (p) => (1 - Math.cos(Math.PI * p)) / 2;
   const clamp = (p) => Math.min(1, Math.max(0, p));
 
-  // a glyph in one colour, whole font pixels only
-  const sprite = (ch, colour) => {
-    const c = document.createElement("canvas");
-    c.width = Math.ceil(cell);
-    c.height = Math.ceil(line);
-    const g = c.getContext("2d");
-    g.font = t.font;
-    g.fillText(ch, 0, t.base);
-    const img = g.getImageData(0, 0, c.width, c.height), on = [...rgb(colour), 255];
-    for (let i = 0; i < img.data.length; i += 4) img.data.set(img.data[i + 3] > 127 ? on : [0, 0, 0, 0], i);
-    g.putImageData(img, 0, 0);
-    return c;
-  };
-  const head = sprite(SHADES[0], "#ffffff");
-  const shades = SHADES.map((ch, i) => (i ? sprite(ch, mix("#ffffff", t.pink, i / SHADES.length)) : head));
+  const head = glyph(t, SHADES[0], "#ffffff");
+  const shades = SHADES.map((ch, i) => glyph(t, ch, i ? mix("#ffffff", t.pink, i / SHADES.length) : "#ffffff"));
 
   // schedule: one letter every `step` ms, a line feed after each line but the
   // last, and the last letter pink 20ms before the end
@@ -730,6 +735,105 @@ function blackholeIn(h, done) {
   }, done);
 }
 
+// glitch: every letter flickers through random characters while strays spam
+// the space around the title and bands of pixels tear sideways. The letters
+// lock into the Cyrillic spelling one by one, hold (with one more burst),
+// scramble again and land on the pink title. The randomness is keyed to time,
+// not frames, so it runs the same on any refresh rate.
+const CYRILLIC = ["КОМПОСЕР", "СОФТВАРЕ"];
+const GLITCH_MS = 1800;
+
+function glitchIn(h, done) {
+  const t = pinkTitle(h);
+  const { src, cell, line } = t;
+  const fp = cell / 8;                                  // one font pixel
+  const pad = Math.ceil(line / fp) * fp;
+  const W = t.w + 2 * pad, H = t.ht + 2 * pad;
+  const CHARS = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&@*+=<>?/\\|~^!ЖЯЮФШЩДЛБЭЙЦ░▒▓█▀▄▌▐■☺☻♥♦♣♠•◘○◙♪♫☼►◄‼¶§↨↑↓→←↔▲▼αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤÷≈√²"];
+  const HOT = ["#ffffff", "#55ffff", "#ff55ff", t.pink];
+  const DIM = ["#555555", "#aaaaaa", "#00aaaa", "#aa00aa"];
+  // timeline, ms
+  const CYR_FROM = 300, CYR_TO = 700, BURST = 930, BURST_MS = 70, LAT_FROM = 1150, LAT_TO = 1550, SCRAMBLE = 110;
+
+  // a random number 0..1 for (a, b), the same every time it is asked
+  const seed = Math.random() * 2 ** 32 | 0;
+  const rnd = (a, b) => {
+    let x = Math.imul(a ^ seed, 0x9e3779b1) ^ Math.imul(b + 0x7f4a7c15, 0x85ebca6b);
+    x = Math.imul(x ^ (x >>> 15), 0x2c1b3c6d);
+    return ((x ^ (x >>> 12)) >>> 0) / 2 ** 32;
+  };
+  const pick = (list, a, b) => list[Math.floor(rnd(a, b) * list.length)];
+  const snap = (v) => Math.round(v / fp) * fp;
+  const between = (v, a, b) => a + v * (b - a);
+
+  const cells = t.letters.map((l, k) => ({
+    x: l.x + pad, y: l.y + pad, l,
+    cyr: (CYRILLIC[l.row] || "")[l.col],
+    toCyr: between(rnd(k, 1), CYR_FROM, CYR_TO),
+    toLat: between(rnd(k, 2), LAT_FROM, LAT_TO - SCRAMBLE) + SCRAMBLE,
+    every: between(rnd(k, 3), 35, 70),                  // ms per random character
+  }));
+  const burst = (ms) => ms >= BURST && ms < BURST + BURST_MS;
+  // how wild it is: strays and tears, full at first, calm while the Cyrillic
+  // holds, a smaller wave while the letters change back
+  const wild = (ms) => {
+    if (ms < 500) return 1;
+    if (ms < 900) return 1 - (ms - 500) / 400;
+    if (burst(ms)) return 0.8;
+    if (ms >= LAT_FROM - 50 && ms < LAT_TO) return 0.4 * Math.sin((ms - LAT_FROM + 50) / (LAT_TO - LAT_FROM + 50) * Math.PI);
+    return 0;
+  };
+
+  const buf = document.createElement("canvas");
+  buf.width = W;
+  buf.height = H;
+  const b = buf.getContext("2d");
+
+  canvasIn(h, t, pad, (ctx, ms) => {
+    b.clearRect(0, 0, W, H);
+    const w = wild(ms);
+
+    // strays: random characters all over, a new batch every 60ms
+    const batch = Math.floor(ms / 60);
+    for (let i = 0, n = Math.round(16 * w); i < n; i++) {
+      const s = batch * 64 + i;
+      b.drawImage(glyph(t, pick(CHARS, s, 4), pick(rnd(s, 5) < 0.5 ? HOT : DIM, s, 6)),
+        snap(rnd(s, 7) * (W - cell)), snap(rnd(s, 8) * (H - line)));
+    }
+
+    // the letters
+    cells.forEach((c, k) => {
+      const tick = Math.floor(ms / c.every);
+      const r = rnd(k * 997 + tick, 9);
+      if (ms >= c.toLat) {
+        b.drawImage(src, c.l.x, c.l.y, cell, line, c.x, c.y, cell, line);
+        return;
+      }
+      const cyr = ms >= c.toCyr && ms < c.toLat - SCRAMBLE && c.cyr;
+      if (cyr && !(burst(ms) && r < 0.5)) {
+        b.drawImage(glyph(t, c.cyr, "#ffffff"), c.x, c.y);
+        return;
+      }
+      if (r < 0.1) return;                              // a blank flicker
+      const ch = pick(CHARS, k, tick * 31 + 10);
+      if (r < 0.4) {                                    // colour fringes
+        b.drawImage(glyph(t, ch, "#55ffff"), c.x - fp, c.y);
+        b.drawImage(glyph(t, ch, "#ff55ff"), c.x + fp, c.y);
+      }
+      b.drawImage(glyph(t, ch, pick(HOT, k, tick * 31 + 11)), c.x, c.y);
+    });
+
+    // tears: bands of rows shifted sideways, new ones every 50ms
+    const tear = Math.floor(ms / 50);
+    for (let y = 0, i = 0; y < H; i++) {
+      const bh = Math.min(H - y, snap(between(rnd(tear * 128 + i, 12), 1, 6) * fp) || fp);
+      const shift = rnd(tear * 128 + i, 13) < 0.35 * w ? snap((rnd(tear * 128 + i, 14) - 0.5) * 4 * cell * w) : 0;
+      ctx.drawImage(buf, 0, y, W, bh, shift, y, W, bh);
+      y += bh;
+    }
+  }, done, GLITCH_MS);
+}
+
 // 8-connected groups of set cells in a w x h grid, as lists of indices
 function pieces(grid, w, h) {
   const seen = new Uint8Array(grid.length);
@@ -785,7 +889,8 @@ function sheen(h) {
 
 if (title && intro.contains("intro")) {
   const start = () => { if (intro.contains("intro") && !title.querySelector(".raster")) rasterIn(title); };
-  document.fonts.ready.then(start);
+  // the Cyrillic glyphs are a separate font file, only fetched when asked for
+  Promise.all([document.fonts.ready, document.fonts.load('16px "IBM VGA"', CYRILLIC.join(""))]).then(start, start);
   // never leave the title hidden if fonts are slow
   setTimeout(() => { if (!title.querySelector(".raster")) intro.remove("intro"); }, 1500);
 }

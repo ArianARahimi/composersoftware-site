@@ -10,6 +10,8 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
   (CC BY-SA 4.0, see `fonts/LICENSE.TXT`)
 - `fonts/PxPlus_IBM_VGA_8x16-copyright.woff2`: only the © sign from PxPlus_IBM_VGA_8x16
   (same pack and license), since Px437 has no ©
+- `fonts/PxPlus_IBM_VGA_8x16-cyrillic.woff2`: only the Cyrillic letters from PxPlus_IBM_VGA_8x16
+  (same pack and license), for the glitch title intro
 
 Links use clean addresses (`/projects`, not `projects.html`). GitHub Pages serves
 those; a local preview server may need the `.html` typed in.

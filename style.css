@@ -14,6 +14,14 @@
   font-display: swap;
 }
 
+/* Cyrillic, from the same PxPlus font (not in Px437) */
+@font-face {
+  font-family: "IBM VGA";
+  src: url("fonts/PxPlus_IBM_VGA_8x16-cyrillic.woff2") format("woff2");
+  unicode-range: U+0400-045F, U+0490-0491;
+  font-display: swap;
+}
+
 /* ZealOS colors */
 :root {
   --bg: #000000;
@@ -244,8 +252,8 @@ code { font: inherit; color: var(--yellow); }
 
 /* home title raster slide-in (site.js) */
 .hero h1 { position: relative; }
-/* hidden until the intro starts (html.intro, see site.js); shown after 3s anyway if site.js never runs */
-.intro .hero h1 { color: transparent; animation: intro-fallback 0s 3s forwards; }
+/* hidden until the intro starts (html.intro, see site.js); shown after 4s anyway if site.js never runs */
+.intro .hero h1 { color: transparent; animation: intro-fallback 0s 4s forwards; }
 @keyframes intro-fallback { to { color: var(--yellow); } }
 .raster { position: absolute; inset: 0; pointer-events: none; }
 .raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }
