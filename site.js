@@ -231,23 +231,29 @@ function painter() {
 }
 
 // the pink title drawn once on a canvas, for canvas effects to copy from;
-// anti-aliased edges are thresholded so only whole font pixels remain
+// anti-aliased edges are thresholded so only whole font pixels remain. It is
+// as wide as the text, not the heading (the buttons below can make that wider),
+// so effects centred on it are centred on the letters
 function pinkTitle(h) {
   const cs = getComputedStyle(h);
-  const w = h.clientWidth;
+  const font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const lines = h.innerHTML.split(/<br\s*\/?>/i);
+  const src = document.createElement("canvas");
+  let sc = src.getContext("2d");
+  sc.font = font;
+  const m = sc.measureText("M");
+  const w = Math.ceil(Math.max(...lines.map((l) => [...l].length)) * m.width);
   const ht = Math.round(h.getBoundingClientRect().height);
   const line = parseFloat(cs.lineHeight);
-  const src = document.createElement("canvas");
-  src.width = w;
+  src.width = w;                                        // resizing resets the context
   src.height = ht;
-  const sc = src.getContext("2d");
-  sc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-  const m = sc.measureText("M");
+  sc = src.getContext("2d");
+  sc.font = font;
   const cell = m.width;
   const ascent = m.fontBoundingBoxAscent;
   const base = (line - ascent - m.fontBoundingBoxDescent) / 2 + ascent;
   const letters = [];
-  h.innerHTML.split(/<br\s*\/?>/i).forEach((text, row) => [...text].forEach((ch, col) => {
+  lines.forEach((text, row) => [...text].forEach((ch, col) => {
     letters.push({ x: col * cell, y: row * line, row, col });
     sc.fillText(ch, col * cell, row * line + base);
   }));
