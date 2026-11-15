@@ -68,7 +68,7 @@ def whats_new(repo, rel, releases):
         return ""
     cmp = get(f"{repo}/compare/{older[0]['tag_name']}...{rel['tag_name']}")
     titles = [c["commit"]["message"].split("\n")[0] for c in cmp.get("commits", [])]
-    titles = [t for t in titles if not re.match(r"(merge|version|bump|release)\b", t, re.I)][-8:]
+    titles = [t for t in titles if not re.match(r"(merge|version|bump|release|readme|docs?|tests?|ci)\b", t, re.I)][-8:]
     return bullets("\n".join(reversed(titles))) if titles else ""
 
 
