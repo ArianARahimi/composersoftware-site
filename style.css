@@ -95,7 +95,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   margin-left: 0;
   vertical-align: -3px;
   background: var(--yellow);
-  animation: blink 1s steps(1) 2s infinite;
+  animation: blink 1s steps(1) 2.2s infinite;
 }
 @keyframes blink { 50% { visibility: hidden; } }
 
@@ -106,7 +106,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   overflow: hidden;
   white-space: pre;
   vertical-align: top;
-  animation: type 0.9s steps(21) 1.1s both;
+  animation: type 0.9s steps(21) 1.3s both;
 }
 @keyframes type { from { width: 0; } }
 
@@ -245,8 +245,7 @@ code { font: inherit; color: var(--yellow); }
 .hero h1 { position: relative; }
 .hero h1.raster-wait { color: transparent; }
 .raster { position: absolute; inset: 0; pointer-events: none; }
-.raster-row { position: absolute; inset: 0; color: var(--yellow); animation: raster-in 700ms steps(14, end) both; }
-@keyframes raster-in { from { transform: translateX(var(--from)); } to { transform: none; } }
+.raster-row { position: absolute; inset: 0; color: var(--yellow); transform: translateX(-200vw); }
 
 /* phones */
 @media (max-width: 600px) {
