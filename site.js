@@ -385,8 +385,8 @@ function hopIn(h, done) {
 }
 
 // sand: every font pixel of the title is a grain that falls from a line
-// above it, each starting at a random moment, timed so the last grain lands
-// as the effect ends
+// above it. It fills from the bottom up: lower grains land first, each layer
+// scattered at random, and the top grains land as the effect ends
 function sandIn(h, done) {
   const px = textPixel();
   const t = pinkTitle(h);
@@ -395,6 +395,7 @@ function sandIn(h, done) {
   const top = -line;                                    // where grains start falling
   const pad = Math.ceil(line / px) * px;
   const fall = 450;                                     // ms to fall the full height
+  const SCATTER = 200;                                  // ms of randomness within a layer
   const g = 2 * (t.ht - top) / fall ** 2;               // gravity, pixels per ms squared
   const lit = src.getContext("2d").getImageData(0, 0, t.w, t.ht).data;
   const grains = [];
@@ -403,7 +404,9 @@ function sandIn(h, done) {
       const c = ((y + fp / 2 | 0) * t.w + (x + fp / 2 | 0)) * 4 + 3;
       if (!lit[c]) continue;
       const drop = Math.sqrt(2 * (y - top) / g);       // ms this grain is in the air
-      grains.push({ x, y, start: Math.random() * (RASTER_MS - drop), drop });
+      const height = 1 - y / (t.ht - fp);              // 0 bottom row, 1 top row
+      const land = fall + height * (RASTER_MS - fall - SCATTER) + Math.random() * SCATTER;
+      grains.push({ x, y, start: land - drop, drop });
     }
   }
   canvasIn(h, t, pad, (ctx, ms) => {
