@@ -183,7 +183,7 @@ footer.site p + p { margin-top: 4px; }
 .list { margin: 0 0 16px; padding: 0; list-style: none; }
 .list li { padding-left: 2ch; text-indent: -2ch; margin-bottom: 4px; }
 .list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
-.shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); }
+.shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); align-self: center; }
 @media (max-width: 760px) {
   .project-body { grid-template-columns: 1fr; }
 }
@@ -205,6 +205,7 @@ footer.site p + p { margin-top: 4px; }
 .crumbs { margin-bottom: 24px; color: var(--grey); }
 .wide-note { margin-bottom: 40px; }
 .how { row-gap: 8px; }
+.sub { margin: 24px 0 12px; padding-bottom: 4px; border-bottom: 2px solid var(--blue); color: var(--light-blue); }
 
 /* bottom of every page: the way back without scrolling up */
 .foot-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 24px; }
