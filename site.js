@@ -122,17 +122,39 @@ for (const card of document.querySelectorAll(".card-link")) {
   });
 }
 
-// home page title: a Game Boy style raster slide-in. The title is cut into
-// rows as thin as one pixel of the regular text, so the interlacing matches
-// the rest of the page even though the title is bigger. Even and odd rows swing in opposite directions
-// along a sine wave that travels down the title and calms down until the
-// title is still. Positions snap to whole pixels of the regular text.
+// home page title intro: one effect, picked at random on each visit (never
+// the same twice in a row). The title is cut into rows as thin as one pixel
+// of the regular text, so the effect matches the rest of the page even though
+// the title is bigger. Each effect moves the rows and calms down
+// until the plain title is left; positions snap to whole pixels.
 
 const title = document.querySelector(".hero h1");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const RASTER_MS = 1300;
 
+// each effect: (row index, row position in title pixels, progress 0..1, title pixel)
+// returns { x, y } for that row
+const EFFECTS = {
+  // neighbouring rows swing in opposite directions
+  interlace: (i, r, p, big) => ({ x: (i % 2 ? 1 : -1) * 24 * big * (1 - p) ** 2 * Math.cos(r * 0.35 - p * 16) }),
+  // all rows sway together in a travelling wave, like a flag
+  ripple: (_i, r, p, big) => ({ x: 16 * big * (1 - p) ** 2 * Math.sin(r * 0.25 - p * 14) }),
+  // rows bunch up and stretch vertically
+  squash: (_i, r, p, big) => ({ y: 4 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12) }),
+};
+
+function pickEffect() {
+  const names = Object.keys(EFFECTS);
+  let last = "";
+  try { last = localStorage.getItem("intro-effect") || ""; } catch { /* no storage */ }
+  const choices = names.filter((n) => n !== last);
+  const name = choices[Math.floor(Math.random() * choices.length)];
+  try { localStorage.setItem("intro-effect", name); } catch { /* no storage */ }
+  return name;
+}
+
 function rasterIn(h) {
+  const effect = EFFECTS[pickEffect()];
   const px = parseFloat(getComputedStyle(document.body).fontSize) / 16;   // regular text pixel
   const big = parseFloat(getComputedStyle(h).fontSize) / 16;              // title pixel
   const height = Math.round(h.getBoundingClientRect().height);
@@ -151,24 +173,50 @@ function rasterIn(h) {
   }
   h.append(box);
 
+  const snap = (v) => Math.round((v || 0) / px) * px;
   const t0 = performance.now();
   function frame(now) {
     const p = Math.min(1, (now - t0) / RASTER_MS);
-    const amp = 24 * big * Math.pow(1 - p, 2);  // the swing calms down
     rows.forEach((row, i) => {
-      const side = i % 2 ? 1 : -1;               // neighbours swing opposite ways
-      const wave = Math.cos((i * px / big) * 0.35 - p * 16);
-      const x = Math.round((side * amp * wave) / px) * px;
-      row.style.transform = `translateX(${x}px)`;
+      const f = effect(i, i * px / big, p, big);
+      row.style.transform = `translate(${snap(f.x)}px, ${snap(f.y)}px)`;
     });
     if (p < 1) {
       requestAnimationFrame(frame);
     } else {
       box.remove();
       h.classList.remove("raster-wait");
+      sheen(h);
     }
   }
   requestAnimationFrame(frame);
+}
+
+// a shine over the title as it lands: a diagonal sweep turns the neon pink
+// title white, a second sweep turns it yellow; then the plain heading returns
+function sheen(h) {
+  const original = h.innerHTML;
+  const lines = original.split(/<br\s*\/?>/i);
+  // two sweeps along the same "/" diagonal (the bottom row runs one letter
+  // ahead of the row above): the first turns each letter white, the second,
+  // right after, turns it yellow
+  const STEP = 18;
+  const longest = Math.max(...lines.map((l) => l.length));
+  const pass = (longest + lines.length - 1) * STEP;     // one full sweep
+  const hold = pass + 60;                               // white until the second sweep
+  h.innerHTML = lines.map((line, row) =>
+    [...line].map((ch, col) => {
+      const delay = (line.length - 1 - col + lines.length - 1 - row) * STEP;
+      return `<span class="sheen-ch" style="animation-delay:${delay}ms;animation-duration:${hold}ms">${ch}</span>`;
+    }).join("")
+  ).join("<br>");
+  const letters = h.querySelectorAll(".sheen-ch");
+  let left = letters.length;
+  h.addEventListener("animationend", function done() {
+    if (--left > 0) return;
+    h.removeEventListener("animationend", done);
+    h.innerHTML = original;
+  });
 }
 
 if (title && !calm) {

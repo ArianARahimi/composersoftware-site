@@ -28,6 +28,7 @@
   --bright-cyan: #55ffff;
   --green: #55ff55;
   --magenta: #ff55ff;
+  --pink: #ff2d95; /* neon pink, only for the title intro */
   --x: #a24444;
   --width: 992px; /* 960px of content plus the side padding */
   --card: 304px;
@@ -245,7 +246,10 @@ code { font: inherit; color: var(--yellow); }
 .hero h1 { position: relative; }
 .hero h1.raster-wait { color: transparent; }
 .raster { position: absolute; inset: 0; pointer-events: none; }
-.raster-row { position: absolute; inset: 0; color: var(--yellow); transform: translateX(-200vw); }
+.raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }
+/* the shine: pink, then white from the first sweep, yellow from the second (timing set in site.js) */
+.sheen-ch { animation-name: sheen-ch; animation-fill-mode: both; }
+@keyframes sheen-ch { 0% { color: var(--pink); } 0.1%, 99.9% { color: var(--text); } 100% { color: var(--yellow); } }
 
 /* phones */
 @media (max-width: 600px) {
