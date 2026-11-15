@@ -123,6 +123,9 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   text-decoration: none;
 }
 .button:hover { color: var(--bg); background: var(--yellow); }
+.button:hover::after, .button:focus-visible::after {
+  background: repeating-conic-gradient(var(--yellow) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+}
 
 /* dithered pixel shadow */
 .button::after, .win::after {
