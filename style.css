@@ -194,6 +194,9 @@ footer.site p + p { margin-top: 4px; }
 .card-title:hover { color: inherit; background: none; }
 .card-link.hot { border-color: var(--yellow); cursor: pointer; }
 .card-link.hot .win-bar h2 { background: var(--yellow); }
+.card-link.hot::after, .card-link:has(.card-title:focus-visible)::after {
+  background: repeating-conic-gradient(var(--yellow) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+}
 .card-link:has(.card-title:focus-visible) { border-color: var(--yellow); }
 /* Download and Source: invisible extra click area around each */
 .win-foot > a, .download summary { position: relative; }
