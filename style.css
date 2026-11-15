@@ -216,8 +216,9 @@ footer.site p + p { margin-top: 4px; }
 .topic summary::-webkit-details-marker { display: none; }
 .topic summary::before { content: "\25BA"; display: inline-block; width: 16px; color: var(--yellow); }
 .topic[open] summary::before { content: "\25BC"; }
-.topic summary:hover, .topic summary:focus-visible { color: var(--bg); background: var(--bright-cyan); outline: none; }
-.topic summary:hover::before, .topic summary:focus-visible::before { color: var(--bg); }
+/* calm hover: no bright fill across the window */
+.topic summary:hover { color: var(--yellow); text-decoration: underline; text-underline-offset: 2px; }
+.topic summary:focus-visible { outline: 2px dotted var(--yellow); outline-offset: -2px; }
 .topic > :not(summary) { margin-left: 24px; }
 .topic[open] { margin-bottom: 16px; }
 .steps { margin: 8px 0 12px; padding-left: 32px; }
