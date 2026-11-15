@@ -176,6 +176,18 @@ footer.site {
 }
 footer.site p + p { margin-top: 4px; }
 
+/* projects page: one detailed window per project */
+.win.project { margin-bottom: 40px; }
+.project-body { display: grid; grid-template-columns: 1fr 336px; gap: 24px; align-items: start; }
+.lead { color: var(--yellow); }
+.list { margin: 0 0 16px; padding: 0; list-style: none; }
+.list li { padding-left: 2ch; text-indent: -2ch; margin-bottom: 4px; }
+.list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
+.shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); }
+@media (max-width: 760px) {
+  .project-body { grid-template-columns: 1fr; }
+}
+
 /* phones */
 @media (max-width: 600px) {
   main { padding-top: 40px; }

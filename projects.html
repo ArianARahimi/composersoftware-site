@@ -9,8 +9,8 @@
 <meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://composersoftware.net/projects">
-<link rel="stylesheet" href="style.css?v=14">
-<script src="site.js?v=14" defer></script>
+<link rel="stylesheet" href="style.css?v=15">
+<script src="site.js?v=15" defer></script>
 </head>
 <body>
 
@@ -26,15 +26,27 @@
 
 <main>
   <h1 class="page">Projects</h1>
-  <div class="grid">
-  <article class="win">
+  <article class="win project" id="vt-quarantine">
     <header class="win-bar"><h2>VirusTotal Quarantine</h2><span class="win-tag">RELEASED</span></header>
-    <div class="win-body">
-      <p>Keeps downloads in a quarantine folder until VirusTotal has checked them.</p>
-      <dl class="facts">
-        <dt>Runs on:</dt><dd>Windows, macOS, Linux</dd>
-        <dt>License:</dt><dd>MIT</dd>
-      </dl>
+    <div class="win-body project-body">
+      <div>
+        <p class="lead">Every download checked on VirusTotal before it reaches your Downloads folder.</p>
+        <p>Your browser saves each download into a hidden quarantine folder. VirusTotal Quarantine
+          locks it, looks it up on VirusTotal, and moves it to your Downloads folder if no antivirus
+          engine flags it. Anything flagged waits for you, with its report a click away.</p>
+        <ul class="list">
+          <li>No window, no tray icon: everything happens in notifications</li>
+          <li>Sets up Chrome, Edge, Firefox, Safari, Brave and more by itself</li>
+          <li>Files stay locked until they're checked, and private files are never uploaded without asking</li>
+        </ul>
+        <dl class="facts">
+          <dt>Runs on:</dt><dd>Windows 10/11, macOS, Linux</dd>
+          <dt>Written in:</dt><dd>Python</dd>
+          <dt>License:</dt><dd>MIT, free and open source</dd>
+        </dl>
+      </div>
+      <img class="shot" src="images/vt-quarantine-notifications.png" width="332" height="522"
+        alt="Notifications: a flagged setup.exe with Show report and Delete buttons, and a clean file moved to Downloads">
     </div>
     <div class="win-foot">
       <details class="download">
@@ -51,9 +63,9 @@
         </div>
       </details>
       <a href="https://github.com/ArianARahimi/vt-quarantine">Source</a>
+      <a href="https://github.com/ArianARahimi/vt-quarantine/blob/master/docs/GUIDE.md">Guide</a>
     </div>
   </article>
-  </div>
 </main>
 
 <footer class="site">
