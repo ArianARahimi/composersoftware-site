@@ -125,17 +125,17 @@ for (const card of document.querySelectorAll(".card-link")) {
 // home page title intro: one effect, picked at random on each visit (never
 // the same twice in a row). The title is cut into rows as thin as one pixel
 // of the regular text, so the effect matches the rest of the page even though
-// the title is bigger. Each effect moves the rows and calms down
-// until the plain title is left; positions snap to whole pixels.
+// the title is bigger. Each effect calms down until the plain title is left;
+// positions snap to whole pixels.
 
 const title = document.querySelector(".hero h1");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const RASTER_MS = 1300;
 
-// each effect: (row index, row position in title pixels, progress 0..1, title pixel,
-// random phase) returns { x, y } for that row. The random phase shifts where
-// the wave starts, so no two visits look the same.
-const EFFECTS = {
+// row effects: (row index, row position in title pixels, progress 0..1,
+// title pixel, random phase) returns { x, y } for that row. The random phase
+// shifts where the wave starts, so no two visits look the same.
+const ROW_EFFECTS = {
   // neighbouring rows swing in opposite directions
   interlace: (i, r, p, big, phase) => ({ x: (i % 2 ? 1 : -1) * 24 * big * (1 - p) ** 2 * Math.cos(r * 0.35 - p * 16 + phase) }),
   // all rows sway together in a travelling wave, like a flag
@@ -143,6 +143,10 @@ const EFFECTS = {
   // rows bunch up and stretch vertically
   squash: (_i, r, p, big, phase) => ({ y: 10 * big * (1 - p) ** 2 * Math.sin(r * 0.2 + p * 12 + phase) }),
 };
+
+// every effect: (heading, done) and calls done() once the plain title is back
+const EFFECTS = { flip: flipUp };
+for (const [name, fn] of Object.entries(ROW_EFFECTS)) EFFECTS[name] = (h, done) => rowsIn(h, fn, done);
 
 function pickEffect() {
   const names = Object.keys(EFFECTS);
@@ -155,9 +159,17 @@ function pickEffect() {
 }
 
 function rasterIn(h) {
-  const effect = EFFECTS[pickEffect()];
+  EFFECTS[pickEffect()](h, () => {
+    h.classList.remove("raster-wait");
+    sheen(h);
+  });
+}
+
+const textPixel = () => parseFloat(getComputedStyle(document.body).fontSize) / 16;
+
+function rowsIn(h, effect, done) {
   const phase = Math.random() * Math.PI * 2;
-  const px = parseFloat(getComputedStyle(document.body).fontSize) / 16;   // regular text pixel
+  const px = textPixel();
   const big = parseFloat(getComputedStyle(h).fontSize) / 16;              // title pixel
   const height = Math.round(h.getBoundingClientRect().height);
   const count = Math.ceil(height / px);
@@ -187,8 +199,84 @@ function rasterIn(h) {
       requestAnimationFrame(frame);
     } else {
       box.remove();
-      h.classList.remove("raster-wait");
-      sheen(h);
+      done();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// Mode 7 style flip: each letter starts lying flat, tipped away from you, and
+// swings up on its bottom edge, one after another from the C to the last e.
+// Drawn on a canvas a row at a time; rows further back are narrower. Pixels
+// are only doubled or dropped (no smoothing), so it stays as sharp as the font.
+function flipUp(h, done) {
+  const TURN = 400;                                     // ms for one letter
+  const cs = getComputedStyle(h);
+  const px = textPixel();
+  const w = h.clientWidth;
+  const ht = Math.round(h.getBoundingClientRect().height);
+  const line = parseFloat(cs.lineHeight);
+  const lines = h.innerHTML.split(/<br\s*\/?>/i);
+
+  // the pink title, drawn once to copy rows from
+  const src = document.createElement("canvas");
+  src.width = w;
+  src.height = ht;
+  const sc = src.getContext("2d");
+  sc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const m = sc.measureText("M");
+  const cell = m.width;
+  const ascent = m.fontBoundingBoxAscent;
+  const base = (line - ascent - m.fontBoundingBoxDescent) / 2 + ascent;
+  const letters = [];
+  lines.forEach((text, row) => [...text].forEach((ch, col) => {
+    letters.push({ x: col * cell, y: row * line });
+    sc.fillText(ch, col * cell, row * line + base);
+  }));
+  // keep only whole font pixels, all in the same pink
+  const pink = getComputedStyle(document.documentElement).getPropertyValue("--pink").trim();
+  const rgb = [1, 3, 5].map((i) => parseInt(pink.slice(i, i + 2), 16));
+  const img = sc.getImageData(0, 0, w, ht);
+  for (let i = 0; i < img.data.length; i += 4) {
+    img.data.set(img.data[i + 3] > 127 ? [...rgb, 255] : [0, 0, 0, 0], i);
+  }
+  sc.putImageData(img, 0, 0);
+
+  const cv = document.createElement("canvas");
+  cv.width = w;
+  cv.height = ht;
+  cv.className = "raster raster-canvas";
+  cv.setAttribute("aria-hidden", "true");
+  const ctx = cv.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  h.append(cv);
+
+  const far = 3 * line;                                 // camera distance: perspective strength
+  const gap = (RASTER_MS - TURN) / Math.max(1, letters.length - 1);
+  const t0 = performance.now();
+  function frame(now) {
+    const t = now - t0;
+    ctx.clearRect(0, 0, w, ht);
+    letters.forEach((l, k) => {
+      const q = Math.min(1, Math.max(0, (t - k * gap) / TURN));
+      const a = (1 - q) ** 3 * Math.PI / 2;            // 90 degrees flat, 0 upright
+      const sin = Math.sin(a), cos = Math.cos(a);
+      const bottom = l.y + line;
+      for (let u = 0; ; u += px) {
+        const v = u + px / 2;                           // screen height above the hinge
+        const s = v * far / (far * cos - v * sin);      // height on the letter
+        if (s < 0 || s >= line) break;
+        const dw = Math.round(cell * far / (far + s * sin) / px) * px;
+        const dx = l.x + Math.round((cell - dw) / 2 / px) * px;
+        const sy = bottom - px - Math.floor(s / px) * px;
+        ctx.drawImage(src, l.x, sy, cell, px, dx, bottom - px - u, dw, px);
+      }
+    });
+    if (t < RASTER_MS) {
+      requestAnimationFrame(frame);
+    } else {
+      cv.remove();
+      done();
     }
   }
   requestAnimationFrame(frame);

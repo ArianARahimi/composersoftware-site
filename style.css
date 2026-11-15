@@ -247,6 +247,7 @@ code { font: inherit; color: var(--yellow); }
 .hero h1.raster-wait { color: transparent; }
 .raster { position: absolute; inset: 0; pointer-events: none; }
 .raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }
+.raster-canvas { inset: 0 auto auto 0; image-rendering: pixelated; }
 /* the shine: pink, then white from the first sweep, yellow from the second (timing set in site.js) */
 .sheen-ch { animation-name: sheen-ch; animation-fill-mode: both; }
 @keyframes sheen-ch { 0% { color: var(--pink); } 0.1%, 99.9% { color: var(--text); } 100% { color: var(--yellow); } }
