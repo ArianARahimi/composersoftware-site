@@ -47,7 +47,7 @@ def section(body):
         if re.match(r"#+\s*(what'?s new|changes|changelog)\b", line.strip(), re.I):
             rest = []
             for more in lines[i + 1:]:
-                if more.startswith("#"):
+                if more.startswith("#") or (not more.strip() and any(r.strip() for r in rest)):
                     break
                 rest.append(more)
             return "\n".join(rest).strip() or None
