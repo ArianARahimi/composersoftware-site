@@ -179,7 +179,6 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   background: var(--bg);
 }
 .win::after { inset: 8px -10px -10px 8px; }
-.card-link::after { inset: 10px -14px -14px 10px; }    /* small cards: 12px shadow, big windows 8px */
 .win-bar {
   position: absolute;
   top: -9px;
