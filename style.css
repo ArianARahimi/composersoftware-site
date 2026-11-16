@@ -179,6 +179,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   background: var(--bg);
 }
 .win::after { inset: 8px -10px -10px 8px; }
+.card-link::after { inset: 10px -14px -14px 10px; }    /* small cards: 12px shadow, big windows 8px */
 .win-bar {
   position: absolute;
   top: -9px;
@@ -363,11 +364,7 @@ code { font: inherit; color: var(--yellow); }
   image-rendering: pixelated;
 }
 .icon-windows { background-image: url("icons/windows.png"); }
-.icon-macos {
-  background-image: url("icons/macos.png");
-  /* white apple, 1px black outline so it stands out on the grey */
-  filter: invert(1) drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
-}
+.icon-macos { background-image: url("icons/macos.png"); }
 .icon-linux { background-image: url("icons/linux.png"); }
 
 /* small phones: narrower tiles so the download window fits a 320px screen */
