@@ -4,11 +4,12 @@
 // squeezed up and down), scrolls, and slowly moves its colour bands, and
 // every so often eases into a new set of wave settings. A new random
 // combination on every visit. Drawn at a quarter of the resolution, 30
-// frames a second, only while on screen; reduced motion gets one still frame.
+// frames a second, only while on screen. The page loads this file only for
+// visitors who allow motion.
 
-const backdrop = document.querySelector(".backdrop");
-
-if (backdrop) {
+function backdropStart() {
+  const backdrop = document.querySelector(".backdrop");
+  if (!backdrop) return;
   const canvas = document.createElement("canvas");
   canvas.className = "backdrop-bg";
   canvas.setAttribute("aria-hidden", "true");
@@ -16,7 +17,6 @@ if (backdrop) {
   const ctx = canvas.getContext("2d");
   const SCALE = 4, FPS = 30, HEIGHT = 320;
   const T = 64, MASK = T - 1;                             // tile size, low-res pixels
-  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const any = (list) => list[Math.floor(Math.random() * list.length)];
@@ -150,8 +150,9 @@ if (backdrop) {
   addEventListener("resize", size);
   document.fonts.ready.then(size);
   size();
-  if (!still) {
-    new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(canvas);
-    requestAnimationFrame(tick);
-  }
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(canvas);
+  requestAnimationFrame(tick);
 }
+
+if (document.readyState === "loading") addEventListener("DOMContentLoaded", backdropStart);
+else backdropStart();

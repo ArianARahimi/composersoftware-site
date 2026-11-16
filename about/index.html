@@ -9,9 +9,16 @@
 <meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://composersoftware.net/about/">
-<link rel="stylesheet" href="/style.css?v=77">
-<script src="/site.js?v=77" defer></script>
-<script src="/backdrop.js?v=77" defer></script>
+<link rel="stylesheet" href="/style.css?v=78">
+<script src="/site.js?v=78" defer></script>
+<script>
+// the moving background, only for visitors who allow motion
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const s = document.createElement("script");
+  s.src = "/backdrop.js?v=78";
+  document.head.append(s);
+}
+</script>
 </head>
 <body id="top">
 
