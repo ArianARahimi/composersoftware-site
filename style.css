@@ -159,6 +159,11 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   -webkit-mask-image: linear-gradient(#000 45%, transparent 92%);
   mask-image: linear-gradient(#000 45%, transparent 92%);
 }
+/* a hard black shadow keeps text over the pattern readable: one font pixel
+   for the headings, two for regular text */
+.backdrop { --shade: 2px 2px 0 var(--bg); }
+.backdrop .hero h1 { --shade: 3px 3px 0 var(--bg); }
+.backdrop h1, .backdrop .prompt, .backdrop .crumbs, .backdrop .blurb { text-shadow: var(--shade); }
 
 /* cards: fixed widths so text stays on whole pixels */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
@@ -262,14 +267,15 @@ code { font: inherit; color: var(--yellow); }
 
 /* home title intro (site.js, intro/) */
 /* hidden until the intro starts (html.intro, see site.js); shown after 3s anyway if site.js never runs */
-.intro .hero h1 { color: transparent; animation: intro-fallback 0s 3s forwards; }
-@keyframes intro-fallback { to { color: var(--yellow); } }
+.intro .hero h1 { color: transparent; text-shadow: none; animation: intro-fallback 0s 3s forwards; }
+@keyframes intro-fallback { to { color: var(--yellow); text-shadow: var(--shade, none); } }
 .raster { position: absolute; inset: 0; pointer-events: none; }
 .raster-row { position: absolute; inset: 0; color: var(--pink); transform: translateX(-200vw); }
 .raster-canvas { inset: 0 auto auto 0; image-rendering: pixelated; }
 /* the shine: pink, then white from the first sweep, yellow from the second (timing set in intro/core.js) */
 .sheen-ch { animation-name: sheen-ch; animation-fill-mode: both; }
-@keyframes sheen-ch { 0% { color: var(--pink); } 0.1%, 99.9% { color: var(--text); } 100% { color: var(--yellow); } }
+/* the title's shadow arrives with the sheen */
+@keyframes sheen-ch { 0% { color: var(--pink); text-shadow: none; } 0.1%, 99.9% { color: var(--text); text-shadow: var(--shade, none); } 100% { color: var(--yellow); text-shadow: var(--shade, none); } }
 
 /* phones */
 @media (max-width: 600px) {
