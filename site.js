@@ -125,23 +125,32 @@ for (const card of document.querySelectorAll(".card-link")) {
 
 // home page title intro: index.html picks the effect before the first paint
 // and starts downloading intro/core.js and the effect's file (introReady);
-// this runs it once those and the fonts are in.
+// this runs it once those and the fonts are in. When it is over, however it
+// ended, html gets data-intro-done and window an "intro-done" event.
 
 const title = document.querySelector(".hero h1");
 const intro = document.documentElement.classList;
 
 if (title && intro.contains("intro")) {
   const name = document.documentElement.dataset.intro;
+  let over = false;
+  const finished = () => {
+    if (over) return;
+    over = true;
+    document.documentElement.dataset.introDone = "";
+    window.dispatchEvent(new Event("intro-done"));
+  };
   const reveal = () => intro.remove("intro");
+  const skip = () => { reveal(); finished(); };
   (window.introReady || Promise.reject(new Error("no intro")))
     .then(() => Promise.all([document.fonts.ready, INTROS[name].chars && document.fonts.load('16px "IBM VGA"', INTROS[name].chars)]))
     .then(() => {
       if (!intro.contains("intro")) return;             // too late, the title is showing
       INTROS[name](title, () => {
         reveal();
-        sheen(title);
+        sheen(title, finished);
       });
-    }, reveal);
+    }, skip);
   // never leave the title hidden if scripts or fonts are slow
-  setTimeout(() => { if (!title.querySelector(".raster")) reveal(); }, 1500);
+  setTimeout(() => { if (!title.querySelector(".raster")) skip(); }, 1500);
 }

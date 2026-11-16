@@ -175,7 +175,8 @@ function canvasIn(h, t, pad, draw, done) {
 
 // a shine over the title as it lands: a diagonal sweep turns the neon pink
 // title white, a second sweep turns it yellow; then the plain heading returns
-function sheen(h) {
+// and done() is called
+function sheen(h, done) {
   const original = h.innerHTML;
   const lines = original.split(/<br\s*\/?>/i);
   // two sweeps along the same "/" diagonal (the bottom row runs one letter
@@ -193,9 +194,10 @@ function sheen(h) {
   ).join("<br>");
   const letters = h.querySelectorAll(".sheen-ch");
   let left = letters.length;
-  h.addEventListener("animationend", function done() {
+  h.addEventListener("animationend", function ended() {
     if (--left > 0) return;
-    h.removeEventListener("animationend", done);
+    h.removeEventListener("animationend", ended);
     h.innerHTML = original;
+    if (done) done();
   });
 }

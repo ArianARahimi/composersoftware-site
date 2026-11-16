@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=80">
+<link rel="stylesheet" href="style.css?v=81">
 <script>
 // title intro (skipped for reduced motion): picked here, before the first paint,
 // so the title never flashes first and its files download alongside site.js,
@@ -30,16 +30,23 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   // shared parts, then the effect: they download together and run in order
   window.introReady = Promise.all(["core", pick].map((file) => new Promise((ok, fail) => {
     const s = document.createElement("script");
-    s.src = "intro/" + file + ".js?v=80";
+    s.src = "intro/" + file + ".js?v=81";
     s.async = false;
     s.onload = ok;
     s.onerror = fail;
     document.head.append(s);
   })));
   window.introReady.catch(() => {});                    // site.js handles a failure
+  // the moving background behind the title, which fades in after the intro
+  // (not for visitors saving data)
+  if (!(navigator.connection && navigator.connection.saveData)) {
+    const b = document.createElement("script");
+    b.src = "backdrop.js?v=81";
+    document.head.append(b);
+  }
 }
 </script>
-<script src="site.js?v=80" defer></script>
+<script src="site.js?v=81" defer></script>
 </head>
 <body id="top">
 
@@ -54,7 +61,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </nav>
 </header>
 
-<main>
+<main class="backdrop">
   <section class="hero">
     <div class="hero-text">
     <h1>Composer<br>Software</h1>

@@ -175,5 +175,11 @@ function backdropStart() {
   requestAnimationFrame(tick);
 }
 
-if (document.readyState === "loading") addEventListener("DOMContentLoaded", backdropStart);
-else backdropStart();
+// on the home page it waits for the title intro to finish
+function backdropWhenReady() {
+  const d = document.documentElement.dataset;
+  if ("intro" in d && !("introDone" in d)) addEventListener("intro-done", backdropStart, { once: true });
+  else backdropStart();
+}
+if (document.readyState === "loading") addEventListener("DOMContentLoaded", backdropWhenReady);
+else backdropWhenReady();

@@ -158,7 +158,9 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   image-rendering: pixelated;
   -webkit-mask-image: linear-gradient(#000 45%, transparent 92%);
   mask-image: linear-gradient(#000 45%, transparent 92%);
+  animation: nes-fade 0.6s steps(4) both;              /* four hard steps up from black */
 }
+@keyframes nes-fade { from { opacity: 0; } }
 /* a hard black shadow keeps text over the pattern readable: one font pixel
    for the headings, two for regular text */
 .backdrop { --shade: 2px 2px 0 var(--bg); }
