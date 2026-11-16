@@ -336,21 +336,17 @@ code { font: inherit; color: var(--yellow); }
   background: var(--dark-blue);
   color: var(--yellow);
 }
-/* close box, mirrors the title on the right */
+/* close box, mirrors the title on the right, like ZealOS */
 .dos-close {
   position: absolute;
   top: 0;
   right: 16px;
   z-index: 1;
-  width: 20px;
-  height: 20px;
-  padding: 1px 0 0;                                      /* centres the X */
-  box-sizing: border-box;
-  border: 2px solid var(--bg);
+  padding: 2px 8px;                                      /* same as the title: 3 text cells wide */
+  border: 0;
   background: var(--red);
   color: var(--text);
   font: inherit;
-  line-height: 16px;
   cursor: pointer;
 }
 .dos-close::before { content: ""; position: absolute; inset: -8px; }   /* bigger hit area */
