@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=100">
+<link rel="stylesheet" href="style.css?v=101">
 <script>
 // title intro (skipped for reduced motion): picked here, before the first paint,
 // so the title never flashes first and its files download alongside site.js,
@@ -30,7 +30,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   // shared parts, then the effect: they download together and run in order
   window.introReady = Promise.all(["core", pick].map((file) => new Promise((ok, fail) => {
     const s = document.createElement("script");
-    s.src = "intro/" + file + ".js?v=100";
+    s.src = "intro/" + file + ".js?v=101";
     s.async = false;
     s.onload = ok;
     s.onerror = fail;
@@ -41,12 +41,12 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   // (not for visitors saving data)
   if (!(navigator.connection && navigator.connection.saveData)) {
     const b = document.createElement("script");
-    b.src = "backdrop.js?v=100";
+    b.src = "backdrop.js?v=101";
     document.head.append(b);
   }
 }
 </script>
-<script src="site.js?v=100" defer></script>
+<script src="site.js?v=101" defer></script>
 </head>
 <body id="top">
 

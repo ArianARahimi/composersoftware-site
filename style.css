@@ -67,7 +67,7 @@ h1, h2, p, dl { margin: 0; }
 h1, h2 { font-size: 1em; font-weight: normal; }
 
 a { color: var(--bright-cyan); text-underline-offset: 2px; }
-a:hover { color: var(--bg); background: var(--bright-cyan); text-decoration: none; }
+a:hover { color: var(--yellow); }                         /* calm hover: yellow text, no box */
 a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
 /* centered on whole pixels so the pixel font stays sharp */
@@ -309,7 +309,7 @@ code { font: inherit; color: var(--yellow); }
 .download { position: relative; }
 .download summary { color: var(--bright-cyan); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; list-style: none; }
 .download summary::-webkit-details-marker { display: none; }
-.download summary:hover, .download[open] summary { color: var(--bg); background: var(--bright-cyan); text-decoration: none; }
+.download summary:hover, .download[open] summary { color: var(--yellow); }
 .download summary:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
 .dos-wrap { position: absolute; z-index: 10; top: 28px; left: 0; }
