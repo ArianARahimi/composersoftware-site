@@ -347,7 +347,10 @@ code { font: inherit; color: var(--yellow); }
   color: var(--bg);
   text-decoration: none;
 }
-.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); background: var(--dark-blue); outline: none; }
+.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); outline: none; }
+/* like Program Manager: the label lights up, the icon stays as drawn */
+.dos-menu a > span:not(.icon) { padding: 0 4px; }
+.dos-menu a:hover > span:not(.icon), .dos-menu a:focus-visible > span:not(.icon) { background: var(--dark-blue); }
 .dos-menu .key { color: var(--red); }
 .dos-menu a:hover .key, .dos-menu a:focus-visible .key { color: var(--text); }
 .dos-menu .note { color: var(--dark-grey); }
@@ -364,7 +367,6 @@ code { font: inherit; color: var(--yellow); }
 }
 .icon-windows { background-image: url("icons/windows.png"); }
 .icon-macos { background-image: url("icons/macos.png"); }
-.dos-menu a:hover .icon-macos, .dos-menu a:focus-visible .icon-macos { filter: invert(1); }  /* black apple turns white on the dark blue */
 .icon-linux { background-image: url("icons/linux.png"); }
 
 /* small phones: narrower tiles so the download window fits a 320px screen */
