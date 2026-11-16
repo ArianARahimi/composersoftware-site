@@ -178,7 +178,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   border: 2px solid var(--blue);
   background: var(--bg);
 }
-.win::after { inset: 10px -14px -14px 10px; }          /* 12px like the download window, inside the 2px border */
+.win::after { inset: 8px -10px -10px 8px; }
 .win-bar {
   position: absolute;
   top: -9px;
