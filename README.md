@@ -6,7 +6,7 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
   (a new page also goes in the header and footer nav of every other page)
 - `style.css`: styles, ZealOS colors at the top
 - `site.js`: typing over the tagline on the home page (desktop only), closing the download window on a click outside it, clickable project windows, and starting the title intro
-- `backdrop.js`: the moving pattern behind the top of a page, on Home (fading in once the title intro is over) and About; any `<main class="backdrop">` gets it
+- `backdrop.js`: the moving pattern behind the top of a page, on the home page only, fading in once the title intro is over
 - `intro/`: the home page title intros. `core.js` holds the shared parts, every other file is one effect.
   The home page downloads `core.js` and the one effect it picks; other pages download none of it.
   `index.html` picks the effect in its first script and starts those downloads at once, next to `site.js`.
