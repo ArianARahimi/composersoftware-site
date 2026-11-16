@@ -132,6 +132,10 @@ function backdropStart() {
   function paint(l, i, s) {
     const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
     recolour(l, Math.round(l.drift * s * 2));
+    // the pattern only gets its scale, set before fillStyle: iPhone browsers
+    // ignore pattern transforms changed after that. Strips move the canvas.
+    at.a = at.d = px;
+    l.pattern.setTransform(at);
     ctx.fillStyle = l.pattern;
     for (let y = 0; y < H; y += strip) {
       const row = y / px;                               // in pattern pixels
@@ -144,12 +148,11 @@ function backdropStart() {
         ox = sx + (l.mode === "split" && Math.floor(row) % 2 ? -wave : wave);
         oy = -sy;
       }
-      at.a = at.d = px;
-      at.e = Math.round(ox * px);
-      at.f = Math.round(oy * px);
-      l.pattern.setTransform(at);
-      ctx.fillRect(0, y, W, strip);
+      const e = Math.round(ox * px), f = Math.round(oy * px);
+      ctx.setTransform(1, 0, 0, 1, e, f);
+      ctx.fillRect(-e, y - f, W, strip);
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   function draw(t) {
