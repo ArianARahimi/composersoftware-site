@@ -73,7 +73,7 @@ INTROS.glitch = function glitchIn(h, done) {
       }
       const cyr = ms >= c.toCyr && ms < c.toLat - SCRAMBLE && c.cyr;
       if (cyr && !(burst(ms) && r < 0.5)) {
-        b.drawImage(glyph(t, c.cyr, "#ffffff"), c.x, c.y);
+        b.drawImage(glyph(t, c.cyr, t.pink), c.x, c.y);
         return;
       }
       if (r < 0.1) return;                              // a blank flicker
