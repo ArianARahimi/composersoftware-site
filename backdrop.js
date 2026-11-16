@@ -3,9 +3,9 @@
 // rows with a sine wave (sideways, sideways in opposite directions, or
 // squeezed up and down), scrolls, and slowly moves its colour bands, and
 // every so often eases into a new set of wave settings. A new random
-// combination on every visit. Pattern pixels are 4 screen pixels; the
-// graphics card slides them a pixel at a time in strips 2 pixels tall, every
-// frame, only while on screen. The page loads this file only for visitors
+// combination on every visit. Pattern pixels are 4 CSS pixels (2 on narrow
+// screens), drawn at the screen's real resolution so they stay sharp; the
+// graphics card slides them a pixel at a time, every frame, only while on screen. The page loads this file only for visitors
 // who allow motion and haven't asked to save data.
 
 function backdropStart() {
@@ -18,7 +18,10 @@ function backdropStart() {
   const ctx = canvas.getContext("2d");
   // phones: strips twice as tall and at most about 60 frames a second, to go easy on the battery
   const phone = matchMedia("(pointer: coarse)").matches;
-  const HEIGHT = 320, PX = 4, STRIP = phone ? 4 : 2;  // screen pixels: band height, pattern pixel, strip
+  const HEIGHT = 320, STRIP = phone ? 4 : 2;          // CSS pixels: band height, strip
+  // drawn at the screen's real resolution so nothing gets scaled (and blurred);
+  // the sizes below are in those device pixels, set by size()
+  let px = 4, strip = 2, H = HEIGHT;
   const T = 64;                                         // tile size, pattern pixels
 
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -107,15 +110,19 @@ function backdropStart() {
     l.pattern = ctx.createPattern(l.tile, "repeat");
   }
 
-  let w = 0, visible = true, last = -1e9, prev = 0;
+  let w = 0, W = 0, visible = true, last = -1e9, prev = 0;
   const phase = [0, 0];                                 // wave phase, summed so speed changes stay smooth
   const at = new DOMMatrix();
 
   function size() {
     const left = Math.round(backdrop.getBoundingClientRect().left);
     w = document.documentElement.clientWidth;
-    canvas.width = w;
-    canvas.height = HEIGHT;
+    const dpr = window.devicePixelRatio || 1;
+    W = canvas.width = Math.round(w * dpr);
+    H = canvas.height = Math.round(HEIGHT * dpr);
+    // pattern pixels: 4 CSS pixels, 2 on narrow screens so the pattern isn't huge
+    px = Math.max(1, Math.round((w <= 600 ? 2 : 4) * dpr));
+    strip = Math.max(1, Math.min(px, Math.round(STRIP * dpr)));   // never taller than a pattern pixel
     Object.assign(canvas.style, { left: -left + "px", width: w + "px", height: HEIGHT + "px" });
     draw(Math.max(0, last));
   }
@@ -126,8 +133,8 @@ function backdropStart() {
     const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
     recolour(l, Math.round(l.drift * s * 2));
     ctx.fillStyle = l.pattern;
-    for (let y = 0, n = 0; y < HEIGHT; y += STRIP, n++) {
-      const row = y / PX;                               // in pattern pixels
+    for (let y = 0; y < H; y += strip) {
+      const row = y / px;                               // in pattern pixels
       const wave = q.amp * Math.sin(q.freq * row + phase[i]);
       let ox, oy;
       if (l.mode === "squeeze") {
@@ -137,11 +144,11 @@ function backdropStart() {
         ox = sx + (l.mode === "split" && Math.floor(row) % 2 ? -wave : wave);
         oy = -sy;
       }
-      at.a = at.d = PX;
-      at.e = Math.round(ox * PX);
-      at.f = Math.round(oy * PX);
+      at.a = at.d = px;
+      at.e = Math.round(ox * px);
+      at.f = Math.round(oy * px);
       l.pattern.setTransform(at);
-      ctx.fillRect(0, y, w, STRIP);
+      ctx.fillRect(0, y, W, strip);
     }
   }
 
