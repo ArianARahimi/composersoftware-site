@@ -236,6 +236,7 @@ footer.site p + p { margin-top: 4px; }
 /* project pages */
 .crumbs { margin-bottom: 24px; color: var(--grey); }
 .wide-note { margin-bottom: 40px; }
+.about-win { max-width: 720px; margin-bottom: 40px; }
 .how { row-gap: 8px; }
 .sub { margin: 24px 0 12px; padding-bottom: 4px; border-bottom: 2px solid var(--blue); color: var(--light-blue); }
 

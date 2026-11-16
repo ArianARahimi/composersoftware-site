@@ -123,6 +123,16 @@ for (const card of document.querySelectorAll(".card-link")) {
 }
 
 
+// email addresses are put together here, so they aren't sitting in the page
+// for address-harvesting bots; without JavaScript the spelled-out text shows
+
+for (const a of document.querySelectorAll("a.mail")) {
+  const address = a.dataset.user + "@" + a.dataset.domain;
+  a.href = "mailto:" + address;
+  a.textContent = address;
+}
+
+
 // home page title intro: index.html picks the effect before the first paint
 // and starts downloading intro/core.js and the effect's file (introReady);
 // this runs it once those and the fonts are in. When it is over, however it
