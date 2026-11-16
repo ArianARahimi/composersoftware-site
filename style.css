@@ -39,7 +39,6 @@
   --pink: #ff2d95; /* neon pink, only for the title intro */
   --dark-grey: #555555;
   --red: #aa0000;
-  --bright-red: #ff5555;
   --width: 992px; /* 960px of content plus the side padding */
   --card: 304px;
 }
@@ -336,22 +335,6 @@ code { font: inherit; color: var(--yellow); }
   background: var(--dark-blue);
   color: var(--yellow);
 }
-/* close box, mirrors the title on the right, like ZealOS */
-.dos-close {
-  position: absolute;
-  top: 0;
-  right: 16px;
-  z-index: 1;
-  padding: 2px 8px;                                      /* same as the title: 3 text cells wide */
-  border: 0;
-  background: var(--red);
-  color: var(--text);
-  font: inherit;
-  cursor: pointer;
-}
-.dos-close::before { content: ""; position: absolute; inset: -8px; }   /* bigger hit area */
-.dos-close:hover { background: var(--bright-red); }
-.dos-close:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 .dos-menu { display: flex; gap: 8px; margin: 0; padding: 32px 12px 12px; list-style: none; border: 4px double var(--bg); }
 
 /* tiles like a Program Manager group: icon, name, file type */

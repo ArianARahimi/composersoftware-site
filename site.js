@@ -57,7 +57,7 @@ if (line && desktop) {
   });
 }
 
-// download windows close on a click well outside them, on their X, after a choice, or on Escape.
+// download windows close on a click well outside them, after a choice, or on Escape.
 // The slack keeps a near miss from closing the window by accident.
 
 const downloads = document.querySelectorAll(".download");
@@ -77,10 +77,6 @@ document.addEventListener("click", (e) => {
   for (const d of downloads) {
     if (!d.open) continue;
     if (d.contains(e.target)) {
-      if (e.target.closest(".dos-close")) {
-        d.open = false;
-        if (e.detail === 0) d.querySelector("summary").focus();   // keyboard: back to Download
-      }
       if (e.target.closest(".dos-menu a")) setTimeout(() => { d.open = false; });
       continue;
     }
