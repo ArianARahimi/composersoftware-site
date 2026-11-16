@@ -6,6 +6,7 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
   (a new page also goes in the header and footer nav of every other page)
 - `style.css`: styles, ZealOS colors at the top
 - `site.js`: typing over the tagline on the home page (desktop only), closing the download window on a click outside it, clickable project windows, and starting the title intro
+- `backdrop.js`: the moving pattern behind the top of a page, on any page whose `<main>` has class `backdrop` (About)
 - `intro/`: the home page title intros. `core.js` holds the shared parts, every other file is one effect.
   The home page downloads `core.js` and the one effect it picks; other pages download none of it.
   `index.html` picks the effect in its first script and starts those downloads at once, next to `site.js`.
@@ -21,7 +22,7 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 Links use clean addresses (`/projects`, not `projects.html`). GitHub Pages serves
 those; a local preview server may need the `.html` typed in.
 
-When `style.css`, `site.js` or anything in `intro/` changes, raise the `?v=` number in the HTML files
+When `style.css`, `site.js`, `backdrop.js` or anything in `intro/` changes, raise the `?v=` number in the HTML files
 so browsers don't mix a cached old file with the new pages.
 
 ## Projects

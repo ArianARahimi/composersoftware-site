@@ -149,6 +149,17 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .page { font-size: 32px; line-height: 1; }
 .blurb { margin-bottom: 40px; color: var(--grey); }
 
+/* moving pattern behind the top of a page (backdrop.js), fading into the black */
+.backdrop { position: relative; }
+.backdrop-bg {
+  position: absolute;
+  top: 0;
+  z-index: -1;
+  image-rendering: pixelated;
+  -webkit-mask-image: linear-gradient(#000 45%, transparent 92%);
+  mask-image: linear-gradient(#000 45%, transparent 92%);
+}
+
 /* cards: fixed widths so text stays on whole pixels */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
 
