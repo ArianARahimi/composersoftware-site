@@ -140,7 +140,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .button::after, .win::after {
   content: "";
   position: absolute;
-  inset: 8px -8px -8px 8px;
+  inset: 12px -12px -12px 12px;                         /* 12px, same as the download window */
   z-index: -1;
   background: repeating-conic-gradient(var(--blue) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
 }
@@ -178,7 +178,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   border: 2px solid var(--blue);
   background: var(--bg);
 }
-.win::after { inset: 8px -10px -10px 8px; }
+.win::after { inset: 10px -14px -14px 10px; }          /* measured inside the 2px border */
 .win-bar {
   position: absolute;
   top: -9px;
