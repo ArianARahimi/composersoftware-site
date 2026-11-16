@@ -2,7 +2,8 @@
 
 Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 
-- `index.html`, `projects.html`, `404.html`: pages, each with the same header and footer
+- `index.html`, `projects/`, `about/index.html`, `404.html`: pages, each with the same header and footer
+  (a new page also goes in the header and footer nav of every other page)
 - `style.css`: styles, ZealOS colors at the top
 - `site.js`: typing over the tagline on the home page (desktop only), closing the download window on a click outside it, clickable project windows, and starting the title intro
 - `intro/`: the home page title intros. `core.js` holds the shared parts, every other file is one effect.
