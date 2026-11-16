@@ -11,8 +11,8 @@ INTROS.glitch = function glitchIn(h, done) {
   const pad = Math.ceil(cell / 2 / fp) * fp;           // room for tears and fringes only
   const W = t.w + 2 * pad, H = t.ht + 2 * pad;
   const CHARS = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&@*+=<>?/\\|~^!ЖЯЮФШЩДЛБЭЙЦ░▒▓█▀▄▌▐■☺☻♥♦♣♠•◘○◙♪♫☼►◄‼¶§↨↑↓→←↔▲▼αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤÷≈√²"];
-  const HOT = ["#ffffff", "#55ffff", "#ff55ff", "#55ff55", t.pink];
-  const DIM = ["#555555", "#aaaaaa", "#00aaaa", "#aa00aa", "#00aa00"];
+  const HOT = ["#ffffff", "#55ffff", "#ff5555", "#55ff55"];
+  const DIM = ["#555555", "#aaaaaa", "#00aaaa", "#aa0000", "#00aa00"];
   // timeline, ms
   const CALM_FROM = 350, CALM_TO = 600, CYR_FROM = 200, CYR_TO = 480, BURST = 640, BURST_MS = 50;
   const LAT_FROM = 820, LAT_TO = 1150, SCRAMBLE = 90;
@@ -80,7 +80,7 @@ INTROS.glitch = function glitchIn(h, done) {
       const ch = pick(CHARS, k, tick * 31 + 10);
       if (r < 0.4) {                                    // colour fringes
         b.drawImage(glyph(t, ch, "#55ffff"), c.x - fp, c.y);
-        b.drawImage(glyph(t, ch, "#ff55ff"), c.x + fp, c.y);
+        b.drawImage(glyph(t, ch, "#ff5555"), c.x + fp, c.y);
       }
       b.drawImage(glyph(t, ch, pick(HOT, k, tick * 31 + 11)), c.x, c.y);
     });
