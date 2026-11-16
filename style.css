@@ -348,7 +348,10 @@ code { font: inherit; color: var(--yellow); }
   color: var(--bg);
   text-decoration: none;
 }
-.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); background: var(--dark-blue); outline: none; }
+.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); outline: none; }
+/* like Program Manager: only the label lights up */
+.dos-menu a > span:not(.icon) { padding: 0 4px; }
+.dos-menu a:hover > span:not(.icon), .dos-menu a:focus-visible > span:not(.icon) { background: var(--dark-blue); }
 .dos-menu .key { color: var(--red); }
 .dos-menu a:hover .key, .dos-menu a:focus-visible .key { color: var(--text); }
 .dos-menu .note { color: var(--dark-grey); }
