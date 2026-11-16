@@ -43,13 +43,15 @@ function backdropStart() {
       return d * 1.5;
     },
   ];
-  // dark colours, black first, so text stays readable over them
+  // dark colours, black first, so text stays readable over them; all cool,
+  // so they sit well with the cyan menu bar
   const PALETTES = [
     [[0, 0, 0], [0, 0, 44], [0, 0, 84], [10, 22, 124]],                   // blue
-    [[0, 0, 0], [30, 0, 46], [58, 0, 88], [88, 16, 120]],                 // purple
     [[0, 0, 0], [0, 30, 36], [0, 58, 68], [10, 88, 100]],                 // teal
-    [[0, 0, 0], [44, 0, 14], [80, 0, 28], [116, 20, 44]],                 // wine
-    [[0, 0, 0], [0, 34, 14], [0, 64, 26], [16, 96, 40]],                  // green
+    [[0, 0, 0], [30, 0, 46], [58, 0, 88], [88, 16, 120]],                 // purple
+    [[0, 0, 0], [16, 8, 52], [32, 18, 96], [54, 36, 138]],                // indigo
+    [[0, 0, 0], [0, 20, 48], [0, 44, 88], [0, 72, 120]],                  // ocean
+    [[0, 0, 0], [18, 24, 36], [36, 46, 66], [58, 72, 98]],                // slate
   ];
 
   // wave settings; a layer has a few and eases from one to the next
