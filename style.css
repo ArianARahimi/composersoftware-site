@@ -362,6 +362,7 @@ code { font: inherit; color: var(--yellow); }
 }
 .icon-windows { background-image: url("icons/windows.png"); }
 .icon-macos { background-image: url("icons/macos.png"); }
+.dos-menu a:hover .icon-macos, .dos-menu a:focus-visible .icon-macos { filter: invert(1); }  /* black apple turns white on the dark blue */
 .icon-linux { background-image: url("icons/linux.png"); }
 
 /* small phones: narrower tiles so the download window fits a 320px screen */

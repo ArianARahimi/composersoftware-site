@@ -2,6 +2,7 @@
 
 Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 
+- `robots.txt`, `sitemap.xml`: for search engines (a new page goes in the sitemap too)
 - `index.html`, `projects/`, `about/index.html`, `404.html`: pages, each with the same header and footer
   (a new page also goes in the header and footer nav of every other page)
 - `style.css`: styles, ZealOS colors at the top
