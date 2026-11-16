@@ -3,8 +3,9 @@
 // rows with a sine wave (sideways, sideways in opposite directions, or
 // squeezed up and down), scrolls, and slowly moves its colour bands, and
 // every so often eases into a new set of wave settings. A new random
-// combination on every visit. Drawn at a quarter of the resolution, 30
-// frames a second, only while on screen. The page loads this file only for
+// combination on every visit. Pattern pixels are 4 screen pixels but move
+// in steps of 2, about 60 frames a second, evenly paced on any refresh
+// rate, only while on screen. The page loads this file only for
 // visitors who allow motion.
 
 function backdropStart() {
@@ -15,7 +16,7 @@ function backdropStart() {
   canvas.setAttribute("aria-hidden", "true");
   backdrop.prepend(canvas);
   const ctx = canvas.getContext("2d");
-  const SCALE = 4, FPS = 30, HEIGHT = 320;
+  const SCALE = 2, HEIGHT = 320;                       // canvas pixel = 2 screen pixels = half a pattern pixel
   const T = 64, MASK = T - 1;                             // tile size, low-res pixels
 
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -58,7 +59,7 @@ function backdropStart() {
   });
   function layer(palette) {
     const f = any(PATTERNS), field = new Uint8Array(T * T);
-    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) field[y * T + x] = Math.round(f(x, y)) & 255;
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) field[y * T + x] = Math.round(f(x, y) * 2) & 255;   // in half units
     return {
       field, palette,
       mode: any(["side", "split", "squeeze"]),
@@ -106,17 +107,19 @@ function backdropStart() {
   const rowA = new Int32Array(1024), rowB = new Int32Array(1024);
   const offA = new Int32Array(1024), offB = new Int32Array(1024);
 
-  // per row: which tile row to read and how far to shift it sideways
+  // per canvas row: which tile row to read and how far to shift it
+  // sideways, worked out in pattern pixels and kept in half pixels
   function rows(l, i, s, outRow, outOff) {
-    const q = now(l, s), sx = Math.round(l.vx * s), sy = Math.round(l.vy * s);
+    const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
     for (let y = 0; y < h; y++) {
-      const wave = Math.round(q.amp * Math.sin(q.freq * y + phase[i]));
+      const py = y / 2, line = py >> 0;                  // the pattern row this canvas row is in
+      const wave = q.amp * Math.sin(q.freq * line + phase[i]);
       if (l.mode === "squeeze") {
-        outRow[y] = (Math.floor(y * q.squeeze + wave) + sy) & MASK;
-        outOff[y] = sx;
+        outRow[y] = (Math.round((py * q.squeeze + wave + sy) * 2) >> 1) & MASK;
+        outOff[y] = Math.round(sx * 2);
       } else {
-        outRow[y] = (y + sy) & MASK;
-        outOff[y] = sx + (l.mode === "split" && y % 2 ? -wave : wave);
+        outRow[y] = (Math.round((py + sy) * 2) >> 1) & MASK;
+        outOff[y] = Math.round((sx + (l.mode === "split" && line % 2 ? -wave : wave)) * 2);
       }
     }
   }
@@ -128,21 +131,30 @@ function backdropStart() {
     rows(layers[0], 0, s, rowA, offA);
     rows(layers[1], 1, s, rowB, offB);
     const [a, b] = layers;
-    const da = Math.round(a.drift * s), db = Math.round(b.drift * s);
+    const da = Math.round(a.drift * s * 2), db = Math.round(b.drift * s * 2);
     for (let y = 0; y < h; y++) {
       const ra = rowA[y] * T, rb = rowB[y] * T, oa = offA[y], ob = offB[y], k = y * w;
       for (let x = 0; x < w; x++) {
-        const ba = ((a.field[ra + ((x + oa) & MASK)] + da) >> 3) & 3;
-        const bb = ((b.field[rb + ((x + ob) & MASK)] + db) >> 3) & 3;
+        const ba = ((a.field[ra + (((x + oa) >> 1) & MASK)] + da) >> 4) & 3;
+        const bb = ((b.field[rb + (((x + ob) >> 1) & MASK)] + db) >> 4) & 3;
         px[k + x] = mixed[ba][bb];
       }
     }
     ctx.putImageData(img, 0, 0);
   }
 
+  // about 60 frames a second: every frame on a 60Hz screen, every 2nd at
+  // 144Hz, every 4th at 240Hz, so the steps are always evenly spaced
+  let frames = 0, skip = 1, prevT = 0;
+  const gaps = [];
   function tick(t) {
     requestAnimationFrame(tick);
-    if (!visible || document.hidden || t - last < 1000 / FPS) return;
+    if (prevT && gaps.length < 15) {
+      gaps.push(t - prevT);
+      if (gaps.length === 15) skip = Math.max(1, Math.round(16.7 / gaps.sort((x, y) => x - y)[7]));
+    }
+    prevT = t;
+    if (!visible || document.hidden || ++frames % skip) return;
     last = t;
     draw(t);
   }

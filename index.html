@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=78">
+<link rel="stylesheet" href="style.css?v=79">
 <script>
 // title intro (skipped for reduced motion): picked here, before the first paint,
 // so the title never flashes first and its files download alongside site.js,
@@ -30,7 +30,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   // shared parts, then the effect: they download together and run in order
   window.introReady = Promise.all(["core", pick].map((file) => new Promise((ok, fail) => {
     const s = document.createElement("script");
-    s.src = "intro/" + file + ".js?v=78";
+    s.src = "intro/" + file + ".js?v=79";
     s.async = false;
     s.onload = ok;
     s.onerror = fail;
@@ -39,7 +39,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   window.introReady.catch(() => {});                    // site.js handles a failure
 }
 </script>
-<script src="site.js?v=78" defer></script>
+<script src="site.js?v=79" defer></script>
 </head>
 <body id="top">
 
