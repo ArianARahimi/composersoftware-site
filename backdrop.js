@@ -5,8 +5,9 @@
 // every so often eases into a new set of wave settings. A new random
 // combination on every visit. Pattern pixels are 4 CSS pixels (2 on narrow
 // screens), drawn at the screen's real resolution so they stay sharp. Each row
-// of pattern pixels moves as one piece, a screen pixel at a time, so the blocks
-// always keep their size. Only drawn while on screen. The page loads this file
+// of pattern pixels moves as one piece, a screen pixel at a time, and both
+// layers scroll up and down together, so their blocks always line up and keep
+// their size. Only drawn while on screen. The page loads this file
 // only for visitors who allow motion and haven't asked to save data.
 
 function backdropStart() {
@@ -73,13 +74,15 @@ function backdropStart() {
       mode: any(["side", "split", "squeeze"]),
       sets: Array.from({ length: 3 }, settings),
       hold: rand(5, 9),                                 // seconds per set of settings
-      vx: rand(-6, 6), vy: rand(-6, 6),                 // scroll, pattern pixels per second
+      vx: rand(-6, 6),                                  // sideways scroll, pattern pixels per second
       drift: rand(6, 14) * sign(),                      // pattern units per second
     };
   }
   const p1 = Math.floor(Math.random() * PALETTES.length);
   const p2 = (p1 + 1 + Math.floor(Math.random() * (PALETTES.length - 1))) % PALETTES.length;
   const layers = [layer(PALETTES[p1]), layer(PALETTES[p2])];
+  // up and down scroll, shared: both layers' rows of blocks stay on the same lines
+  const vy = rand(-6, 6);
 
   // the layer's wave settings at time s: held, then eased into the next over 1.5s
   function now(l, s) {
@@ -132,7 +135,7 @@ function backdropStart() {
   // blocks has one offset and lines up with the blocks it shows, so blocks
   // never split into thin slivers that flicker as the wave moves.
   function paint(l, i, s) {
-    const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
+    const q = now(l, s), sx = l.vx * s, sy = vy * s;
     recolour(l, Math.round(l.drift * s * 2));
     // the pattern only gets its scale, set before fillStyle: iPhone browsers
     // ignore pattern transforms changed after that. Rows move the canvas.
@@ -143,18 +146,19 @@ function backdropStart() {
       ctx.setTransform(1, 0, 0, 1, e, f);
       ctx.fillRect(-e, y - f, W, px);
     };
+    // rows sit on lines that scroll up or down a screen pixel at a time, the
+    // same lines for both layers
+    const f = Math.round(-sy * px), top = ((f % px) + px) % px - px;
     if (l.mode === "squeeze") {
-      // each screen row shows a whole pattern row; the wave picks which one
+      // each row shows a whole pattern row; the wave picks which one
       const e = Math.round(sx * px);
-      for (let y = 0, row = 0; y < H; y += px, row++) {
+      for (let y = top, row = -1; y < H; y += px, row++) {
         const wave = q.amp * Math.sin(q.freq * row + phase[i]);
-        fill(y, e, (row - Math.round(row * q.squeeze + wave + sy)) * px);
+        fill(y, e, y - Math.round(row * q.squeeze + wave + sy) * px);
       }
     } else {
-      // the pattern scrolls up or down a screen pixel at a time and the rows
-      // follow it; each row slides sideways (alternate rows opposite in split)
-      const f = Math.round(-sy * px);
-      for (let y = ((f % px) + px) % px - px; y < H; y += px) {
+      // each row slides sideways (alternate rows opposite in split)
+      for (let y = top; y < H; y += px) {
         const row = (y - f) / px;                       // the pattern row in this band
         const wave = q.amp * Math.sin(q.freq * row + phase[i]);
         fill(y, Math.round((sx + (l.mode === "split" && (row & 1) ? -wave : wave)) * px), f);
