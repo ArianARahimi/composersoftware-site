@@ -3,7 +3,7 @@
 // rows sideways with a sine wave (all rows together, or alternate rows in
 // opposite directions), scrolls, and slowly moves its colour bands, and
 // every so often eases into a new set of wave settings. A new random
-// combination on every visit. Pattern pixels are 2 CSS pixels, drawn at the
+// combination on every visit. Pattern pixels are 1 CSS pixel, drawn at the
 // screen's real resolution so they stay sharp; bigger blocks made every step
 // of the movement show as shaking. Each row of pattern pixels moves as one
 // piece, a screen pixel at a time, and both layers scroll up and down
@@ -124,7 +124,7 @@ function backdropStart() {
     const dpr = window.devicePixelRatio || 1;
     W = canvas.width = Math.round(w * dpr);
     H = canvas.height = Math.round(HEIGHT * dpr);
-    px = Math.max(1, Math.round(2 * dpr));              // pattern pixels: 2 CSS pixels
+    px = Math.max(1, Math.round(dpr));                  // pattern pixels: 1 CSS pixel
     Object.assign(canvas.style, { left: -left + "px", width: w + "px", height: HEIGHT + "px" });
     draw(Math.max(0, last));
   }
