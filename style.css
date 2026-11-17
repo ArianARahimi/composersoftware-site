@@ -152,6 +152,8 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 
 .section, .page { margin-bottom: 32px; color: var(--yellow); }
 .page { font-size: 32px; line-height: 1; }
+/* the monospace font leaves a gap before a narrow i: tuck it in by one font pixel */
+.fi { letter-spacing: -0.125em; }
 .blurb { margin-bottom: 40px; color: var(--grey); }
 
 /* moving pattern behind the top of a page (backdrop.js), fading into the black */
