@@ -163,7 +163,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   image-rendering: pixelated;
   -webkit-mask-image: linear-gradient(#000 45%, transparent 92%);
   mask-image: linear-gradient(#000 45%, transparent 92%);
-  animation: backdrop-fade 2s ease-in-out both;        /* smooth fade up from black */
+  animation: backdrop-fade 1.5s ease-in-out both;        /* smooth fade up from black */
 }
 @keyframes backdrop-fade { from { opacity: 0; } }
 /* a hard black shadow keeps text over the pattern readable: one font pixel
