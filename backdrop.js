@@ -8,10 +8,10 @@
 // drawn at the screen's real resolution so they stay sharp. Each row of them
 // slides as one piece, a screen pixel at a time, and both layers scroll up and
 // down together, so blocks always line up and keep their size. Colours are
-// dim, soft and from one family, and they stay put. Timed by counting frames,
-// about 60 updates a second on an even beat. Only drawn while on screen. The
-// page loads this file only for visitors who allow motion and haven't asked to
-// save data.
+// dim, soft and from one family, and slowly flow from dark to bright. Timed
+// by counting frames, about 60 updates a second on an even beat. Only drawn
+// while on screen. The page loads this file only for visitors who allow
+// motion and haven't asked to save data.
 
 function backdropStart() {
   const backdrop = document.querySelector(".backdrop");
@@ -48,7 +48,6 @@ function backdropStart() {
     (x, y) => Math.min(Math.abs(x - c), Math.abs(y - c)) * 2,             // crosses
     (x, y) => Math.abs((x % 32) - 16) * 2 + y,                            // zigzag
     (x, y) => Math.min(...[[16, 16], [48, 16], [32, 48], [0, 48]].map(([px, py]) => dist(x, y, px, py))) * 1.5,   // bubbles
-    (x, y) => y + 6 * Math.sin(x * tau / T),                              // wavy stripes
     (x, y) => 12 * Math.sin(x * tau / 32) * Math.sin(y * tau / 32) + 16,  // egg crate
     (x, y) => Math.max(Math.abs(x - c), Math.abs(y - c)) * 1.5,           // squares
     (x, y) => {                                                           // hexagons
@@ -91,6 +90,7 @@ function backdropStart() {
       freq: rand(0.04, 0.16),                           // radians per row, for the whole visit
       dir: sign(),                                      // wave direction, for the whole visit
       vx: rand(-3, 3),                                  // sideways scroll, pattern pixels per second
+      drift: rand(6, 14) * sign(),                      // colour bands creep by this many pattern units per second
     };
   }
   // Easy on the eyes: dimmer, less saturated and with less contrast than the
@@ -119,17 +119,25 @@ function backdropStart() {
     return { amp: mix("amp"), freq: l.freq, speed: mix("speed") * l.dir };
   }
 
-  // each layer's tile, coloured once and used as a fill pattern
+  // each layer's tile, recoloured as its colour bands creep (colours flowing
+  // from dark to bright and back), used as a fill pattern
   for (const l of layers) {
-    const tile = document.createElement("canvas");
-    tile.width = tile.height = T;
-    const tc = tile.getContext("2d"), img = tc.createImageData(T, T), d = img.data;
+    l.tile = document.createElement("canvas");
+    l.tile.width = l.tile.height = T;
+    l.tc = l.tile.getContext("2d");
+    l.img = l.tc.createImageData(T, T);
+    l.shift = null;
+  }
+  function recolour(l, shift) {
+    if (l.shift === shift) return;
+    l.shift = shift;
+    const d = l.img.data;
     for (let i = 0; i < T * T; i++) {
-      const c = l.palette[(l.field[i] >> 4) & 3];
+      const c = l.palette[((l.field[i] + shift) >> 4) & 3];
       d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
     }
-    tc.putImageData(img, 0, 0);
-    l.pattern = ctx.createPattern(tile, "repeat");
+    l.tc.putImageData(l.img, 0, 0);
+    l.pattern = ctx.createPattern(l.tile, "repeat");
   }
 
   let w = 0, W = 0, visible = true, last = -1e9, prev = 0;
@@ -153,6 +161,7 @@ function backdropStart() {
   // never split into thin slivers that flicker as the wave moves.
   function paint(l, i, s) {
     const q = now(l, s), sx = l.vx * s, sy = vy * s;
+    recolour(l, Math.round(l.drift * s * 2));
     // the pattern only gets its scale, set before fillStyle: iPhone browsers
     // ignore pattern transforms changed after that. Rows move the canvas.
     at.a = at.d = px;
