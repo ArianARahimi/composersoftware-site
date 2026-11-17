@@ -1,9 +1,8 @@
 // moving pattern behind the top of the page. Two layers, each a tiling
 // pattern in its own dark colours, mixed half and half. Each layer bends its
 // rows with a sine wave (sideways, sideways in opposite directions, or
-// squeezed up and down), scrolls, and slowly moves its colour bands, and
-// every so often eases into a new set of wave settings. A new random
-// combination on every visit.
+// squeezed up and down), scrolls, and every so often eases into a new set of
+// wave settings. A new random combination on every visit.
 //
 // Drawn the way SNES games drew their wavy backgrounds: on a small canvas
 // where one pixel is one block (4 CSS pixels, 2 on narrow screens), every row
@@ -77,7 +76,6 @@ function backdropStart() {
       sets: Array.from({ length: 3 }, settings),
       hold: rand(5, 9),                                 // seconds per set of settings
       vx: rand(-3, 3), vy: rand(-3, 3),                 // scroll, blocks per second
-      drift: rand(4, 9) * sign(),                       // pattern units per second
     };
   }
   const p1 = Math.floor(Math.random() * PALETTES.length);
@@ -94,24 +92,19 @@ function backdropStart() {
     return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed"), squeeze: mix("squeeze") };
   }
 
-  // each layer's tile, recoloured when its bands move, used as a fill pattern
+  // each layer's tile, coloured once and used as a fill pattern. The colours
+  // stay put: sliding the band edges flipped scattered blocks on every step
+  // (flickering like dither), and cycling whole bands made the stripes jump.
   for (const l of layers) {
-    l.tile = document.createElement("canvas");
-    l.tile.width = l.tile.height = T;
-    l.tc = l.tile.getContext("2d");
-    l.img = l.tc.createImageData(T, T);
-    l.shift = null;
-  }
-  function recolour(l, shift) {
-    if (l.shift === shift) return;
-    l.shift = shift;
-    const d = l.img.data;
+    const tile = document.createElement("canvas");
+    tile.width = tile.height = T;
+    const tc = tile.getContext("2d"), img = tc.createImageData(T, T), d = img.data;
     for (let i = 0; i < T * T; i++) {
-      const c = l.palette[((l.field[i] + shift) >> 4) & 3];
+      const c = l.palette[(l.field[i] >> 4) & 3];
       d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
     }
-    l.tc.putImageData(l.img, 0, 0);
-    l.pattern = lc.createPattern(l.tile, "repeat");
+    tc.putImageData(img, 0, 0);
+    l.pattern = lc.createPattern(tile, "repeat");
   }
 
   let px = 4, visible = true, last = -1e9, prev = 0;
@@ -135,7 +128,6 @@ function backdropStart() {
   // browsers ignore pattern transforms changed after use, so rows move the canvas)
   function paint(l, i, s) {
     const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
-    recolour(l, Math.round(l.drift * s * 2));
     lc.fillStyle = l.pattern;
     for (let row = 0; row < low.height; row++) {
       const wave = q.amp * Math.sin(q.freq * row + phase[i]);
