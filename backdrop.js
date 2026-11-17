@@ -1,16 +1,16 @@
 // moving pattern behind the top of the page. Two layers, each a tiling
-// pattern in its own dark colours, mixed half and half. Each layer bends its
-// rows with a sine wave (sideways, sideways in opposite directions, or
-// squeezed up and down), scrolls, and every so often eases into a new set of
-// wave settings. A new random combination on every visit.
+// pattern, mixed half and half. Each layer bends its rows sideways with a
+// slow sine wave (all rows together, or alternate rows in opposite
+// directions), scrolls, and every so often eases into a new set of wave
+// settings. A new random combination on every visit.
 //
-// Drawn the way SNES games drew their wavy backgrounds: on a small canvas
-// where one pixel is one block (4 CSS pixels, 2 on narrow screens), every row
-// moved by whole blocks, then scaled up without smoothing. Blocks can't split
-// and both layers share one grid. It updates about 60 times a second on an
-// even beat (every 2nd frame at 120 to 144 Hz, every 4th at 240 Hz), timed by
-// counting frames, so every picture stays up equally long. Only drawn while on screen. The page loads
-// this file only for visitors who allow motion and haven't asked to save data.
+// Kept calm on purpose: pattern pixels are 2 CSS pixels, drawn at the screen's
+// real resolution so they stay sharp. Each row of them slides as one piece, a
+// screen pixel at a time, and both layers scroll up and down together, so
+// blocks always line up and keep their size. Colours are dim, soft and from
+// one family, and they stay put. Timed by counting frames, about 60 updates a
+// second on an even beat. Only drawn while on screen. The page loads this file
+// only for visitors who allow motion and haven't asked to save data.
 
 function backdropStart() {
   const backdrop = document.querySelector(".backdrop");
@@ -20,11 +20,13 @@ function backdropStart() {
   canvas.setAttribute("aria-hidden", "true");
   backdrop.prepend(canvas);
   const ctx = canvas.getContext("2d");
-  // the small canvas: one pixel per block
-  const low = document.createElement("canvas");
-  const lc = low.getContext("2d");
-  const HEIGHT = 320;                                   // CSS pixels
-  const T = 64;                                         // tile size, blocks
+  // phones: at most about 60 frames a second, to go easy on the battery
+  const phone = matchMedia("(pointer: coarse)").matches;
+  const HEIGHT = 320;                                   // CSS pixels: band height
+  // drawn at the screen's real resolution so nothing gets scaled (and blurred);
+  // the sizes below are in those device pixels, set by size()
+  let px = 4, H = HEIGHT;
+  const T = 64;                                         // tile size, pattern pixels
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const any = (list) => list[Math.floor(Math.random() * list.length)];
@@ -59,28 +61,38 @@ function backdropStart() {
     [[0, 0, 0], [18, 24, 36], [36, 46, 66], [58, 72, 98]],                // slate
   ];
 
-  // wave settings; a layer has a few and eases from one to the next.
-  // Slow and even, like the SNES backgrounds.
+  // wave settings; a layer has a few and eases from one to the next
   const settings = () => ({
-    amp: rand(2, 10),                                   // blocks
+    amp: rand(2, 10),                                   // pattern pixels
     freq: rand(0.04, 0.22),                             // radians per row
     speed: rand(0.6, 1.7) * sign(),                     // radians per second
-    squeeze: rand(0.5, 1.6),                            // rows per row, squeeze mode
   });
   function layer(palette) {
     const f = any(PATTERNS), field = new Uint8Array(T * T);
     for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) field[y * T + x] = Math.round(f(x, y) * 2) & 255;   // in half units
     return {
       field, palette,
-      mode: any(["side", "split", "squeeze"]),
+      mode: any(["side", "split"]),
       sets: Array.from({ length: 3 }, settings),
       hold: rand(5, 9),                                 // seconds per set of settings
-      vx: rand(-3, 3), vy: rand(-3, 3),                 // scroll, blocks per second
+      vx: rand(-3, 3),                                  // sideways scroll, pattern pixels per second
     };
   }
-  const p1 = Math.floor(Math.random() * PALETTES.length);
-  const p2 = (p1 + 1 + Math.floor(Math.random() * (PALETTES.length - 1))) % PALETTES.length;
-  const layers = [layer(PALETTES[p1]), layer(PALETTES[p2])];
+  // Easy on the eyes: dimmer, less saturated and with less contrast than the
+  // palettes as written, and both layers in one colour family (two clashing
+  // families moving against each other made people dizzy).
+  const DIM = 0.6, SAT = 0.6, SPREAD = 0.65;            // brightness, colour strength, contrast; 1 = as written
+  function soften(palette) {
+    const mean = [0, 1, 2].map((k) => palette.reduce((sum, c) => sum + c[k], 0) / palette.length);
+    return palette.map((c) => {
+      const grey = (c[0] + c[1] + c[2]) / 3;
+      return c.map((v, k) => (mean[k] + (grey + (v - grey) * SAT - mean[k]) * SPREAD) * DIM);
+    });
+  }
+  const palette = soften(any(PALETTES));
+  const layers = [layer(palette), layer(palette)];
+  // up and down scroll, shared: both layers' rows of blocks stay on the same lines
+  const vy = rand(-3, 3);
 
   // the layer's wave settings at time s: held, then eased into the next over 1.5s
   function now(l, s) {
@@ -89,12 +101,10 @@ function backdropStart() {
     const m = into < l.hold - 1.5 ? 0 : (into - l.hold + 1.5) / 1.5;
     const e = m * m * (3 - 2 * m);
     const mix = (key) => a[key] + (b[key] - a[key]) * e;
-    return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed"), squeeze: mix("squeeze") };
+    return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed") };
   }
 
-  // each layer's tile, coloured once and used as a fill pattern. The colours
-  // stay put: sliding the band edges flipped scattered blocks on every step
-  // (flickering like dither), and cycling whole bands made the stripes jump.
+  // each layer's tile, coloured once and used as a fill pattern
   for (const l of layers) {
     const tile = document.createElement("canvas");
     tile.width = tile.height = T;
@@ -104,66 +114,62 @@ function backdropStart() {
       d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
     }
     tc.putImageData(img, 0, 0);
-    l.pattern = lc.createPattern(tile, "repeat");
+    l.pattern = ctx.createPattern(tile, "repeat");
   }
 
-  let px = 4, visible = true, last = -1e9, prev = 0;
+  let w = 0, W = 0, visible = true, last = -1e9, prev = 0;
   const phase = [0, 0];                                 // wave phase, summed so speed changes stay smooth
+  const at = new DOMMatrix();
 
   function size() {
     const left = Math.round(backdrop.getBoundingClientRect().left);
-    const w = document.documentElement.clientWidth;
+    w = document.documentElement.clientWidth;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(w * dpr);                 // the screen's real pixels, so nothing blurs
-    canvas.height = Math.round(HEIGHT * dpr);
-    px = Math.max(1, Math.round((w <= 600 ? 2 : 4) * dpr));   // one block, in screen pixels
-    low.width = Math.ceil(canvas.width / px);
-    low.height = Math.ceil(canvas.height / px);
+    W = canvas.width = Math.round(w * dpr);
+    H = canvas.height = Math.round(HEIGHT * dpr);
+    px = Math.max(1, Math.round(2 * dpr));              // pattern pixels: 2 CSS pixels
     Object.assign(canvas.style, { left: -left + "px", width: w + "px", height: HEIGHT + "px" });
     draw(Math.max(0, last));
   }
 
-  // one layer onto the small canvas, a row of blocks at a time, each row
-  // moved by whole blocks (the pattern itself is never transformed: iPhone
-  // browsers ignore pattern transforms changed after use, so rows move the canvas)
+  // one layer, a row of pattern pixels at a time: the tile scaled to pattern
+  // pixels and moved so the right part of it lands in the row. Each row of
+  // blocks has one offset and lines up with the blocks it shows, so blocks
+  // never split into thin slivers that flicker as the wave moves.
   function paint(l, i, s) {
-    const q = now(l, s), sx = l.vx * s, sy = l.vy * s;
-    lc.fillStyle = l.pattern;
-    for (let row = 0; row < low.height; row++) {
+    const q = now(l, s), sx = l.vx * s, sy = vy * s;
+    // the pattern only gets its scale, set before fillStyle: iPhone browsers
+    // ignore pattern transforms changed after that. Rows move the canvas.
+    at.a = at.d = px;
+    l.pattern.setTransform(at);
+    ctx.fillStyle = l.pattern;
+    const fill = (y, e, f) => {
+      ctx.setTransform(1, 0, 0, 1, e, f);
+      ctx.fillRect(-e, y - f, W, px);
+    };
+    // rows sit on lines that scroll up or down a screen pixel at a time, the
+    // same lines for both layers
+    // Each row slides sideways (alternate rows opposite in split mode).
+    const f = Math.round(-sy * px);
+    for (let y = ((f % px) + px) % px - px; y < H; y += px) {
+      const row = (y - f) / px;                         // the pattern row in this band
       const wave = q.amp * Math.sin(q.freq * row + phase[i]);
-      let ox, oy;
-      if (l.mode === "squeeze") {
-        ox = sx;
-        oy = row - (row * q.squeeze + wave + sy);
-      } else {
-        ox = sx + (l.mode === "split" && row % 2 ? -wave : wave);
-        oy = -sy;
-      }
-      const e = Math.round(ox), f = Math.round(oy);
-      lc.setTransform(1, 0, 0, 1, e, f);
-      lc.fillRect(-e, row - f, low.width, 1);
+      fill(y, Math.round((sx + (l.mode === "split" && (row & 1) ? -wave : wave)) * px), f);
     }
-    lc.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   function draw(t) {
     const s = t / 1000, dt = Math.min(0.1, Math.max(0, s - prev));
     prev = s;
     layers.forEach((l, i) => { phase[i] += now(l, s).speed * dt; });
-    lc.globalAlpha = 1;
-    paint(layers[0], 0, s);
-    lc.globalAlpha = 0.5;                               // half and half
-    paint(layers[1], 1, s);
-    // scale the small canvas up to the screen, block for block, no smoothing
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(low, 0, 0, low.width * px, low.height * px);
+    ctx.globalAlpha = 1;
+    paint(layers[0], 0, s);
+    ctx.globalAlpha = 0.5;                              // half and half
+    paint(layers[1], 1, s);
   }
 
-  // About 60 updates a second on an even beat. Time comes from counting
-  // frames, not from each frame's timestamp: privacy settings in some browsers
-  // round and jitter timestamps, which made the movement lurch. The frame
-  // length is the average over the last few seconds (exact even with a blurred
-  // clock), and only every 2nd (120-144 Hz) or 4th (240 Hz) frame draws.
   let frames = 0, skip = 1, frameMs = 0, clock = 0;
   let since = -1, sinceFrames = 0, prevT = -1;
   function tick(t) {
