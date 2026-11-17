@@ -7,8 +7,8 @@
 // Kept calm on purpose: pattern pixels are 4 CSS pixels (2 on narrow screens),
 // drawn at the screen's real resolution so they stay sharp. Each row of them
 // slides as one piece, a screen pixel at a time, and both layers scroll up and
-// down together, so blocks always line up and keep their size. Colours are
-// dim, soft and from one family, and slowly flow from dark to bright. Timed
+// down together, so blocks always line up and keep their size. The colours,
+// one dim dark blue, slowly flow from dark to bright. Timed
 // by counting frames, about 60 updates a second on an even beat. Only drawn
 // while on screen. The page loads this file only for visitors who allow
 // motion and haven't asked to save data.
@@ -60,16 +60,8 @@ function backdropStart() {
     (x, y) => x + y + 6 * Math.sin((x - y) * tau / T),                    // diagonal waves
     (x, y) => Math.min(x % 32, y % 32) * 2,                               // tiles
   ];
-  // dark colours, black first, so text stays readable over them; all cool,
-  // so they sit well with the cyan menu bar
-  const PALETTES = [
-    [[0, 0, 0], [0, 0, 44], [0, 0, 84], [10, 22, 124]],                   // blue
-    [[0, 0, 0], [0, 30, 36], [0, 58, 68], [10, 88, 100]],                 // teal
-    [[0, 0, 0], [30, 0, 46], [58, 0, 88], [88, 16, 120]],                 // purple
-    [[0, 0, 0], [16, 8, 52], [32, 18, 96], [54, 36, 138]],                // indigo
-    [[0, 0, 0], [0, 20, 48], [0, 44, 88], [0, 72, 120]],                  // ocean
-    [[0, 0, 0], [18, 24, 36], [36, 46, 66], [58, 72, 98]],                // slate
-  ];
+  // one sharp dark blue, black first so text stays readable over it
+  const BLUE = [[0, 0, 0], [0, 0, 44], [0, 0, 84], [10, 22, 124]];
 
   // wave settings; a layer has a few and eases slowly from one to the next.
   // Only size and speed change: a change of direction, or of how many ripples
@@ -93,18 +85,9 @@ function backdropStart() {
       drift: rand(6, 14) * sign(),                      // colour bands creep by this many pattern units per second
     };
   }
-  // Easy on the eyes: dimmer, less saturated and with less contrast than the
-  // palettes as written, and both layers in one colour family (two clashing
-  // families moving against each other made people dizzy).
-  const DIM = 0.6, SAT = 0.6, SPREAD = 0.65;            // brightness, colour strength, contrast; 1 = as written
-  function soften(palette) {
-    const mean = [0, 1, 2].map((k) => palette.reduce((sum, c) => sum + c[k], 0) / palette.length);
-    return palette.map((c) => {
-      const grey = (c[0] + c[1] + c[2]) / 3;
-      return c.map((v, k) => (mean[k] + (grey + (v - grey) * SAT - mean[k]) * SPREAD) * DIM);
-    });
-  }
-  const palette = soften(any(PALETTES));
+  // both layers in the same blue, at 60% brightness
+  const DIM = 0.6;
+  const palette = BLUE.map((c) => c.map((v) => v * DIM));
   const layers = [layer(palette), layer(palette)];
   // up and down scroll, shared: both layers' rows of blocks stay on the same lines
   const vy = rand(-3, 3);
