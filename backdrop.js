@@ -8,8 +8,8 @@
 // where one pixel is one block (4 CSS pixels, 2 on narrow screens), every row
 // moved by whole blocks, then scaled up without smoothing. Blocks can't split
 // and both layers share one grid. It updates about 60 times a second on an
-// even beat (every 2nd frame at 120 to 144 Hz, every 4th at 240 Hz), so every
-// picture stays up equally long. Only drawn while on screen. The page loads
+// even beat (every 2nd frame at 120 to 144 Hz, every 4th at 240 Hz), timed by
+// counting frames, so every picture stays up equally long. Only drawn while on screen. The page loads
 // this file only for visitors who allow motion and haven't asked to save data.
 
 function backdropStart() {
@@ -159,21 +159,28 @@ function backdropStart() {
     ctx.drawImage(low, 0, 0, low.width * px, low.height * px);
   }
 
-  // about 60 updates a second on an even beat: the refresh rate is measured
-  // over the first frames, then only every 2nd (120-144 Hz) or 4th (240 Hz)
-  // frame draws, so each picture stays up just as long as the one before
-  let frames = 0, skip = 1, prevT = 0;
-  const gaps = [];
+  // About 60 updates a second on an even beat. Time comes from counting
+  // frames, not from each frame's timestamp: privacy settings in some browsers
+  // round and jitter timestamps, which made the movement lurch. The frame
+  // length is the average over the last few seconds (exact even with a blurred
+  // clock), and only every 2nd (120-144 Hz) or 4th (240 Hz) frame draws.
+  let frames = 0, skip = 1, frameMs = 0, clock = 0;
+  let since = -1, sinceFrames = 0, prevT = -1;
   function tick(t) {
     requestAnimationFrame(tick);
-    if (prevT && gaps.length < 15) {
-      gaps.push(t - prevT);
-      if (gaps.length === 15) skip = Math.max(1, Math.round(16.7 / gaps.sort((x, y) => x - y)[7]));
-    }
+    if (prevT >= 0 && t - prevT > 250) since = -1;     // paused (hidden tab): start measuring again
     prevT = t;
-    if (!visible || document.hidden || ++frames % skip) return;
-    last = t;
-    draw(t);
+    if (since < 0) { since = t; sinceFrames = 0; }
+    else if (++sinceFrames >= (frameMs ? 120 : 30)) {  // a first guess quickly, then over longer stretches
+      frameMs = Math.min(50, Math.max(2, (t - since) / sinceFrames));
+      skip = Math.max(1, Math.round(16.7 / frameMs));
+      since = t; sinceFrames = 0;
+    }
+    if (!frameMs || !visible || document.hidden) return;   // holds still until the first measurement
+    clock += frameMs;
+    if (++frames % skip) return;
+    last = clock;
+    draw(clock);
   }
 
   addEventListener("resize", size);
