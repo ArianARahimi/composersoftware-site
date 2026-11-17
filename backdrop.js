@@ -4,13 +4,14 @@
 // directions), scrolls, and every so often eases into a new set of wave
 // settings. A new random combination on every visit.
 //
-// Kept calm on purpose: pattern pixels are 2 CSS pixels, drawn at the screen's
-// real resolution so they stay sharp. Each row of them slides as one piece, a
-// screen pixel at a time, and both layers scroll up and down together, so
-// blocks always line up and keep their size. Colours are dim, soft and from
-// one family, and they stay put. Timed by counting frames, about 60 updates a
-// second on an even beat. Only drawn while on screen. The page loads this file
-// only for visitors who allow motion and haven't asked to save data.
+// Kept calm on purpose: pattern pixels are 4 CSS pixels (2 on narrow screens),
+// drawn at the screen's real resolution so they stay sharp. Each row of them
+// slides as one piece, a screen pixel at a time, and both layers scroll up and
+// down together, so blocks always line up and keep their size. Colours are
+// dim, soft and from one family, and they stay put. Timed by counting frames,
+// about 60 updates a second on an even beat. Only drawn while on screen. The
+// page loads this file only for visitors who allow motion and haven't asked to
+// save data.
 
 function backdropStart() {
   const backdrop = document.querySelector(".backdrop");
@@ -127,7 +128,7 @@ function backdropStart() {
     const dpr = window.devicePixelRatio || 1;
     W = canvas.width = Math.round(w * dpr);
     H = canvas.height = Math.round(HEIGHT * dpr);
-    px = Math.max(1, Math.round(2 * dpr));              // pattern pixels: 2 CSS pixels
+    px = Math.max(1, Math.round((w <= 600 ? 2 : 4) * dpr));   // pattern pixels: 4 CSS pixels, 2 on narrow screens
     Object.assign(canvas.style, { left: -left + "px", width: w + "px", height: HEIGHT + "px" });
     draw(Math.max(0, last));
   }
