@@ -62,11 +62,13 @@ function backdropStart() {
     [[0, 0, 0], [18, 24, 36], [36, 46, 66], [58, 72, 98]],                // slate
   ];
 
-  // wave settings; a layer has a few and eases from one to the next
+  // wave settings; a layer has a few and eases slowly from one to the next.
+  // Only size and speed change: a change of direction, or of how many ripples
+  // fit on screen, made rows lurch while the settings changed.
+  const EASE = 5;                                       // seconds to ease into the next settings
   const settings = () => ({
-    amp: rand(2, 10),                                   // pattern pixels
-    freq: rand(0.04, 0.22),                             // radians per row
-    speed: rand(0.6, 1.7) * sign(),                     // radians per second
+    amp: rand(3, 8),                                    // pattern pixels
+    speed: rand(0.6, 1.3),                              // radians per second
   });
   function layer(palette) {
     const f = any(PATTERNS), field = new Uint8Array(T * T);
@@ -75,7 +77,9 @@ function backdropStart() {
       field, palette,
       mode: any(["side", "split"]),
       sets: Array.from({ length: 3 }, settings),
-      hold: rand(5, 9),                                 // seconds per set of settings
+      hold: rand(10, 16),                               // seconds per set of settings
+      freq: rand(0.04, 0.16),                           // radians per row, for the whole visit
+      dir: sign(),                                      // wave direction, for the whole visit
       vx: rand(-3, 3),                                  // sideways scroll, pattern pixels per second
     };
   }
@@ -95,14 +99,14 @@ function backdropStart() {
   // up and down scroll, shared: both layers' rows of blocks stay on the same lines
   const vy = rand(-3, 3);
 
-  // the layer's wave settings at time s: held, then eased into the next over 1.5s
+  // the layer's wave settings at time s: held, then eased into the next
   function now(l, s) {
     const n = l.sets.length, k = Math.floor(s / l.hold), into = s - k * l.hold;
     const a = l.sets[k % n], b = l.sets[(k + 1) % n];
-    const m = into < l.hold - 1.5 ? 0 : (into - l.hold + 1.5) / 1.5;
+    const m = into < l.hold - EASE ? 0 : (into - l.hold + EASE) / EASE;
     const e = m * m * (3 - 2 * m);
     const mix = (key) => a[key] + (b[key] - a[key]) * e;
-    return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed") };
+    return { amp: mix("amp"), freq: l.freq, speed: mix("speed") * l.dir };
   }
 
   // each layer's tile, coloured once and used as a fill pattern
