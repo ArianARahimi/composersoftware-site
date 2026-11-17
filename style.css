@@ -81,13 +81,13 @@ a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 }
 
 /* top bar: brand left, links right */
-.top { position: sticky; top: 0; z-index: 30; background: var(--cyan); }
+.top { position: sticky; top: 0; z-index: 30; background: var(--dark-blue); }
 .top nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; }
 .brand { padding: 4px 8px; color: var(--yellow); background: var(--dark-blue); text-decoration: none; }
 .brand:hover { color: var(--bg); background: var(--yellow); }
 .top ul { display: flex; gap: 16px; margin: 0; padding: 0; list-style: none; }
-.top ul a { display: block; color: var(--bg); text-decoration: none; padding: 4px 8px; }
-.top ul a[aria-current="page"] { color: var(--bright-cyan); background: var(--bg); }
+.top ul a { display: block; color: var(--grey); text-decoration: none; padding: 4px 8px; }
+.top ul a[aria-current="page"] { color: var(--bg); background: var(--bright-cyan); }
 .top ul a:hover { color: var(--bg); background: var(--yellow); }
 
 main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
