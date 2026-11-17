@@ -3,8 +3,13 @@
 @font-face {
   font-family: "IBM VGA";
   src: url("fonts/Px437_IBM_VGA_8x16.woff2") format("woff2");
-  font-display: swap;
+  font-display: block; /* preloaded by every page: no fallback-font flash between pages */
 }
+
+/* switching pages: keep the old page up until the new one is ready, then swap
+   at once (browsers without this just load the page as before) */
+@view-transition { navigation: auto; }
+::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 
 /* the copyright sign, from the PxPlus version of the same font (not in Px437) */
 @font-face {
@@ -83,11 +88,11 @@ a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 /* top bar: brand left, links right */
 .top { position: sticky; top: 0; z-index: 30; background: var(--dark-blue); }
 .top nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; }
-.brand { padding: 4px 8px; color: var(--yellow); background: var(--dark-blue); text-decoration: none; }
+.brand { padding: 4px 8px; color: var(--yellow); background: var(--bg); text-decoration: none; }
 .brand:hover { color: var(--bg); background: var(--yellow); }
 .top ul { display: flex; gap: 16px; margin: 0; padding: 0; list-style: none; }
 .top ul a { display: block; color: var(--grey); text-decoration: none; padding: 4px 8px; }
-.top ul a[aria-current="page"] { color: var(--bg); background: var(--bright-cyan); }
+.top ul a[aria-current="page"] { color: var(--text); background: var(--bg); }
 .top ul a:hover { color: var(--bg); background: var(--yellow); }
 
 main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
@@ -158,9 +163,9 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   image-rendering: pixelated;
   -webkit-mask-image: linear-gradient(#000 45%, transparent 92%);
   mask-image: linear-gradient(#000 45%, transparent 92%);
-  animation: nes-fade 1s steps(3) both;                /* three hard steps up from black */
+  animation: backdrop-fade 3s ease-out both;           /* slow, smooth fade up from black */
 }
-@keyframes nes-fade { from { opacity: 0; } }
+@keyframes backdrop-fade { from { opacity: 0; } }
 /* a hard black shadow keeps text over the pattern readable: one font pixel
    for the headings, two for regular text */
 .backdrop { --shade: 2px 2px 0 var(--bg); }

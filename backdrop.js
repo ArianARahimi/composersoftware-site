@@ -85,8 +85,8 @@ function backdropStart() {
       drift: rand(6, 14) * sign(),                      // colour bands creep by this many pattern units per second
     };
   }
-  // both layers in the same blue, at 60% brightness
-  const DIM = 0.6;
+  // both layers in the same blue, at 55% brightness
+  const DIM = 0.55;
   const palette = BLUE.map((c) => c.map((v) => v * DIM));
   const layers = [layer(palette), layer(palette)];
   // up and down scroll, shared: both layers' rows of blocks stay on the same lines

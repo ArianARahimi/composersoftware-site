@@ -13,7 +13,8 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=103">
+<link rel="stylesheet" href="style.css?v=104">
+<link rel="preload" href="/fonts/Px437_IBM_VGA_8x16.woff2" as="font" type="font/woff2" crossorigin>
 <script>
 // title intro (skipped for reduced motion): picked here, before the first paint,
 // so the title never flashes first and its files download alongside site.js,
@@ -41,7 +42,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
   // (not for visitors saving data)
   if (!(navigator.connection && navigator.connection.saveData)) {
     const b = document.createElement("script");
-    b.src = "backdrop.js?v=115";
+    b.src = "backdrop.js?v=116";
     document.head.append(b);
   }
 }
