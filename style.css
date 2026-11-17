@@ -90,8 +90,8 @@ a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 .top nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; }
 .brand { padding: 4px 8px; color: var(--yellow); background: var(--bg); text-decoration: none; }
 .brand:hover { color: var(--bg); background: var(--yellow); }
-.top ul { display: flex; gap: 16px; margin: 0; padding: 0; list-style: none; }
-.top ul a { display: block; color: var(--grey); text-decoration: none; padding: 4px 8px; }
+.top ul { display: flex; gap: 0; margin: 0; padding: 0; list-style: none; }   /* tabs side by side, touching */
+.top ul a { display: block; min-width: 96px; color: var(--text); text-align: center; text-decoration: none; padding: 4px 8px; }   /* all the same width */
 .top ul a[aria-current="page"] { color: var(--text); background: var(--bg); }
 .top ul a:hover { color: var(--bg); background: var(--yellow); }
 
