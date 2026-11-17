@@ -200,6 +200,8 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .win-tag.wip { background: var(--magenta); }
 .win-body { flex: 1; padding: 24px 16px 20px; }
 .win-body p { margin-bottom: 16px; }
+/* buttons inside a window get their own layer, so their shadow isn't hidden behind the window */
+.win .buttons { isolation: isolate; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 0 8px; }
 .facts dt { color: var(--yellow); }
 .facts dd { min-width: 0; margin: 0; color: var(--text); overflow-wrap: anywhere; }
