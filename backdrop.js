@@ -1,14 +1,15 @@
 // moving pattern behind the top of the page. Two layers, each a tiling
 // pattern in its own dark colours, mixed half and half. Each layer bends its
-// rows with a sine wave (sideways, sideways in opposite directions, or
-// squeezed up and down), scrolls, and slowly moves its colour bands, and
+// rows sideways with a sine wave (all rows together, or alternate rows in
+// opposite directions), scrolls, and slowly moves its colour bands, and
 // every so often eases into a new set of wave settings. A new random
-// combination on every visit. Pattern pixels are 4 CSS pixels (2 on narrow
-// screens), drawn at the screen's real resolution so they stay sharp. Each row
-// of pattern pixels moves as one piece, a screen pixel at a time, and both
-// layers scroll up and down together, so their blocks always line up and keep
-// their size. Only drawn while on screen. The page loads this file
-// only for visitors who allow motion and haven't asked to save data.
+// combination on every visit. Pattern pixels are 2 CSS pixels, drawn at the
+// screen's real resolution so they stay sharp; bigger blocks made every step
+// of the movement show as shaking. Each row of pattern pixels moves as one
+// piece, a screen pixel at a time, and both layers scroll up and down
+// together, so their blocks always line up and keep their size. Only drawn
+// while on screen. The page loads this file only for visitors who allow
+// motion and haven't asked to save data.
 
 function backdropStart() {
   const backdrop = document.querySelector(".backdrop");
@@ -64,14 +65,13 @@ function backdropStart() {
     amp: rand(2, 10),                                   // pattern pixels
     freq: rand(0.04, 0.22),                             // radians per row
     speed: rand(1.2, 3.4) * sign(),                     // radians per second
-    squeeze: rand(0.5, 1.6),                            // rows per row, squeeze mode
   });
   function layer(palette) {
     const f = any(PATTERNS), field = new Uint8Array(T * T);
     for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) field[y * T + x] = Math.round(f(x, y) * 2) & 255;   // in half units
     return {
       field, palette,
-      mode: any(["side", "split", "squeeze"]),
+      mode: any(["side", "split"]),
       sets: Array.from({ length: 3 }, settings),
       hold: rand(5, 9),                                 // seconds per set of settings
       vx: rand(-6, 6),                                  // sideways scroll, pattern pixels per second
@@ -91,7 +91,7 @@ function backdropStart() {
     const m = into < l.hold - 1.5 ? 0 : (into - l.hold + 1.5) / 1.5;
     const e = m * m * (3 - 2 * m);
     const mix = (key) => a[key] + (b[key] - a[key]) * e;
-    return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed"), squeeze: mix("squeeze") };
+    return { amp: mix("amp"), freq: mix("freq"), speed: mix("speed") };
   }
 
   // each layer's tile, recoloured when its bands move, used as a fill pattern
@@ -124,8 +124,7 @@ function backdropStart() {
     const dpr = window.devicePixelRatio || 1;
     W = canvas.width = Math.round(w * dpr);
     H = canvas.height = Math.round(HEIGHT * dpr);
-    // pattern pixels: 4 CSS pixels, 2 on narrow screens so the pattern isn't huge
-    px = Math.max(1, Math.round((w <= 600 ? 2 : 4) * dpr));
+    px = Math.max(1, Math.round(2 * dpr));              // pattern pixels: 2 CSS pixels
     Object.assign(canvas.style, { left: -left + "px", width: w + "px", height: HEIGHT + "px" });
     draw(Math.max(0, last));
   }
@@ -148,21 +147,12 @@ function backdropStart() {
     };
     // rows sit on lines that scroll up or down a screen pixel at a time, the
     // same lines for both layers
-    const f = Math.round(-sy * px), top = ((f % px) + px) % px - px;
-    if (l.mode === "squeeze") {
-      // each row shows a whole pattern row; the wave picks which one
-      const e = Math.round(sx * px);
-      for (let y = top, row = -1; y < H; y += px, row++) {
-        const wave = q.amp * Math.sin(q.freq * row + phase[i]);
-        fill(y, e, y - Math.round(row * q.squeeze + wave + sy) * px);
-      }
-    } else {
-      // each row slides sideways (alternate rows opposite in split)
-      for (let y = top; y < H; y += px) {
-        const row = (y - f) / px;                       // the pattern row in this band
-        const wave = q.amp * Math.sin(q.freq * row + phase[i]);
-        fill(y, Math.round((sx + (l.mode === "split" && (row & 1) ? -wave : wave)) * px), f);
-      }
+    // Each row slides sideways (alternate rows opposite in split mode).
+    const f = Math.round(-sy * px);
+    for (let y = ((f % px) + px) % px - px; y < H; y += px) {
+      const row = (y - f) / px;                         // the pattern row in this band
+      const wave = q.amp * Math.sin(q.freq * row + phase[i]);
+      fill(y, Math.round((sx + (l.mode === "split" && (row & 1) ? -wave : wave)) * px), f);
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
