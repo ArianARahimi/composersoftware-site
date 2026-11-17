@@ -34,7 +34,12 @@ function backdropStart() {
   const sign = () => (Math.random() < 0.5 ? -1 : 1);
 
   // patterns: a value per tile pixel; colour bands follow the value
-  const c = T / 2, tau = Math.PI * 2;
+  const c = (T - 1) / 2, tau = Math.PI * 2;          // c: the exact middle, so opposite edges match
+  // distance on the tile as if it wrapped around, so shapes cross its edges cleanly
+  const wrap = (d) => Math.min(Math.abs(d), T - Math.abs(d));
+  const dist = (x, y, px, py) => Math.hypot(wrap(x - px), wrap(y - py));
+  // Every pattern meets itself at the tile's edges (colours repeat every 32
+  // units, so values may jump by multiples of 32 there), or a seam would show.
   const PATTERNS = [
     (x, y) => Math.abs(x - c) + Math.abs(y - c),                          // diamonds
     (x, y) => Math.hypot(x - c, y - c) * 1.2,                             // rings
@@ -42,14 +47,19 @@ function backdropStart() {
     (x, y) => 16 * (Math.sin(x * tau / T) + Math.sin(y * tau / T)) + 32,  // blobs
     (x, y) => Math.min(Math.abs(x - c), Math.abs(y - c)) * 2,             // crosses
     (x, y) => Math.abs((x % 32) - 16) * 2 + y,                            // zigzag
-    (x, y) => {                                                           // bubbles
-      let d = T;
-      for (const [px, py] of [[16, 16], [48, 16], [32, 48], [0, 48], [64, 48]]) {
-        const dx = Math.min(Math.abs(x - px), T - Math.abs(x - px)), dy = Math.min(Math.abs(y - py), T - Math.abs(y - py));
-        d = Math.min(d, Math.hypot(dx, dy));
-      }
-      return d * 1.5;
+    (x, y) => Math.min(...[[16, 16], [48, 16], [32, 48], [0, 48]].map(([px, py]) => dist(x, y, px, py))) * 1.5,   // bubbles
+    (x, y) => y + 6 * Math.sin(x * tau / T),                              // wavy stripes
+    (x, y) => 12 * Math.sin(x * tau / 32) * Math.sin(y * tau / 32) + 16,  // egg crate
+    (x, y) => Math.max(Math.abs(x - c), Math.abs(y - c)) * 1.5,           // squares
+    (x, y) => {                                                           // hexagons
+      const dx = x - c, dy = (y - c) * 0.866;
+      return Math.max(Math.abs(dx), Math.abs(dx / 2 + dy), Math.abs(dx / 2 - dy)) * 1.3;
     },
+    (x, y) => (dist(x, y, 16, 32) + dist(x, y, 48, 32)) * 0.8,            // interference
+    (x, y) => ((Math.floor(x / 16) + Math.floor(y / 16)) & 1 ? x % 16 : y % 16) * 2,   // staircase
+    (x, y) => 12 * Math.sin(dist(x, y, c, c) * tau / 16) + 16,            // ripples
+    (x, y) => x + y + 6 * Math.sin((x - y) * tau / T),                    // diagonal waves
+    (x, y) => Math.min(x % 32, y % 32) * 2,                               // tiles
   ];
   // dark colours, black first, so text stays readable over them; all cool,
   // so they sit well with the cyan menu bar
