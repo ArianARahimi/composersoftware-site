@@ -224,6 +224,9 @@ footer.site p + p { margin-top: 4px; }
 .list li { padding-left: 2ch; text-indent: -2ch; margin-bottom: 4px; }
 .list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
 .shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); align-self: center; }
+/* a wide window screenshot: the window's full width, between the description and the details */
+.shot-wide { display: block; margin: 8px 0 24px; }
+.shot-wide .shot { width: 100%; }
 @media (max-width: 760px) {
   .project-body { grid-template-columns: 1fr; }
 }
