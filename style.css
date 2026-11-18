@@ -198,6 +198,8 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .win-bar h2 { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
 .win-tag { padding: 0 8px; color: var(--bg); background: var(--green); }
 .win-tag.wip { background: var(--magenta); }
+.win-tags { display: flex; gap: 8px; }
+.win-tag.new { background: var(--yellow); }   /* the newest project */
 .win-body { flex: 1; padding: 24px 16px 20px; }
 .win-body p { margin-bottom: 16px; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 0 8px; }
@@ -241,8 +243,8 @@ footer.site p + p { margin-top: 4px; }
 }
 .card-link:has(.card-title:focus-visible) { border-color: var(--yellow); }
 /* Download and Source: invisible extra click area around each */
-.win-foot > a, .download summary { position: relative; }
-.win-foot > a::before, .download summary::before { content: ""; position: absolute; inset: -12px -8px; }
+.win-foot > a, .download > summary { position: relative; }
+.win-foot > a::before, .download > summary::before { content: ""; position: absolute; inset: -12px -8px; }
 .dim { color: var(--dim); }
 
 /* project pages */
@@ -318,10 +320,10 @@ code { font: inherit; color: var(--yellow); }
 
 /* download popup: an MS-DOS style window that opens under the link */
 .download { position: relative; }
-.download summary { color: var(--bright-cyan); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; list-style: none; }
-.download summary::-webkit-details-marker { display: none; }
-.download summary:hover, .download[open] summary { color: var(--yellow); }
-.download summary:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.download > summary { color: var(--bright-cyan); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; list-style: none; }
+.download > summary::-webkit-details-marker { display: none; }
+.download > summary:hover, .download[open] > summary { color: var(--yellow); }
+.download > summary:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
 .dos-wrap { position: absolute; z-index: 10; top: 28px; left: 0; }
 .dos {
@@ -344,7 +346,7 @@ code { font: inherit; color: var(--yellow); }
   margin: 0;
   padding: 2px 8px;
   background: var(--dark-blue);
-  color: var(--yellow);
+  color: var(--text);
 }
 .dos-menu { display: flex; gap: 8px; margin: 0; padding: 32px 12px 12px; list-style: none; border: 4px double var(--bg); }
 
@@ -359,7 +361,7 @@ code { font: inherit; color: var(--yellow); }
   color: var(--bg);
   text-decoration: none;
 }
-.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--yellow); outline: none; }
+.dos-menu a:hover, .dos-menu a:focus-visible { color: var(--text); outline: none; }
 /* like Program Manager: only the label lights up */
 .dos-menu a > span:not(.icon) { padding: 0 4px; }
 .dos-menu a:hover > span:not(.icon), .dos-menu a:focus-visible > span:not(.icon) { background: var(--dark-blue); }
@@ -384,7 +386,7 @@ code { font: inherit; color: var(--yellow); }
 }
 .pick > summary::-webkit-details-marker { display: none; }
 .pick > summary > span:not(.icon) { padding: 0 4px; }
-.pick > summary:hover, .pick > summary:focus-visible, .pick[open] > summary { color: var(--yellow); outline: none; }
+.pick > summary:hover, .pick > summary:focus-visible, .pick[open] > summary { color: var(--text); outline: none; }
 .pick > summary:hover > span:not(.icon), .pick > summary:focus-visible > span:not(.icon),
 .pick[open] > summary > span:not(.icon) { background: var(--dark-blue); }
 .pick > summary:hover .key, .pick[open] > summary .key { color: var(--text); }
