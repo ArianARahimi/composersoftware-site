@@ -10,7 +10,7 @@
 <meta name="darkreader-lock">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://composersoftware.net/projects/queenfisher">
-<link rel="stylesheet" href="/style.css?v=117">
+<link rel="stylesheet" href="/style.css?v=119">
 <link rel="preload" href="/fonts/Px437_IBM_VGA_8x16.woff2" as="font" type="font/woff2" crossorigin>
 <script src="/site.js?v=103" defer></script>
 </head>
@@ -27,9 +27,10 @@
   </nav>
 </header>
 
-<main>
+<main class="p-queenfisher">
   <p class="crumbs"><a href="/">Home</a> <span aria-hidden="true">&gt;</span> <a href="/projects/">Projects</a> <span aria-hidden="true">&gt;</span> Queen<span class="fi">f</span>isher</p>
   <h1 class="page">Queen<span class="fi">f</span>isher</h1>
+  <p class="kind">Video downloader</p>
   <section class="get" aria-label="Get Queenfisher">
     <div class="dos dos-open">
       <p class="dos-title">Download</p>
@@ -59,22 +60,18 @@
         <p class="lead">The most hassle-free way to download videos. Any site, any service, anytime.</p>
         <p>Queenfisher is a video downloader, built on yt-dlp for the sites and ffmpeg for the
           formats. Queue up as many as you like and they come down one after another.</p>
-        <ul class="list">
-          <li>14 formats: MP4, MKV, WebM, MOV, AVI, FLV and GIF, or MP3, WAV, FLAC, OGG, M4A, ALAC and the original sound</li>
-          <li>Subtitles, whole playlists, and skipping sponsor segments</li>
-          <li>Keeps yt-dlp up to date by itself and checks the developers' signature first</li>
-          <li>No ads, no accounts, no tracking</li>
-        </ul>
+        <hr class="rule">
+        <dl class="facts how">
+          <dt>Formats:</dt><dd>MP4, MKV, WebM, MOV, AVI, FLV and GIF, or MP3, WAV, FLAC, OGG, M4A, ALAC and the original sound.</dd>
+          <dt>Extras:</dt><dd>subtitles, whole playlists, and skipping sponsor segments.</dd>
+          <dt>Updates:</dt><dd>yt-dlp keeps itself current, checked against its developers' signature. When a site changes, Queenfisher updates it and tries again.</dd>
+          <dt>Privacy:</dt><dd>no ads, no accounts, no tracking.</dd>
+        </dl>
+        <hr class="rule">
         <dl class="facts">
           <dt>Runs on:</dt><dd>Windows 10/11, macOS, Linux</dd>
           <dt>Written in:</dt><dd>C++, Qt 6</dd>
           <dt>License:</dt><dd>GPLv3, free and open source</dd>
-        </dl>
-        <p class="sub">How it works</p>
-        <dl class="facts how">
-          <dt>Download:</dt><dd>it goes to your Downloads folder. Add more and they wait their turn.</dd>
-          <dt>Library:</dt><dd>every finished download, ready to open or find again.</dd>
-          <dt>Updates:</dt><dd>yt-dlp keeps itself current. When a site changes, Queenfisher updates it and tries again.</dd>
         </dl>
       </div>
     </article>
@@ -98,47 +95,7 @@
     <div class="win-body">
       <p>Click a topic to open it.</p>
 
-      <details class="topic" open>
-        <summary>Install on Windows</summary>
-        <ol class="steps">
-          <li>Click <a href="https://github.com/ArianARahimi/queenfisher/releases/latest/download/Queenfisher-Windows.exe">Download for Windows</a>.</li>
-          <li>If Edge holds it ("not commonly downloaded"): <code>...</code> menu, then Keep, then Keep anyway.</li>
-          <li>Open Queenfisher.exe. If Windows says it protected your PC: More info, then Run anyway.</li>
-          <li>Put it wherever you like; it's the whole program.</li>
-        </ol>
-        <p>The first time, it fetches yt-dlp, ffmpeg and Deno by itself (about 150 MB) and keeps
-          them up to date.</p>
-      </details>
-
-      <details class="topic">
-        <summary>Install on macOS</summary>
-        <ol class="steps">
-          <li>Download for <a href="https://github.com/ArianARahimi/queenfisher/releases/latest/download/Queenfisher-macOS.zip">Apple Silicon</a> (M1 and newer) or <a href="https://github.com/ArianARahimi/queenfisher/releases/latest/download/Queenfisher-macOS-Intel.zip">Intel</a>.</li>
-          <li>Open the zip and move Queenfisher to Applications.</li>
-          <li>The first time, macOS blocks it: click Done, then System Settings, Privacy &amp; Security, Open Anyway (near the bottom).</li>
-          <li>Install ffmpeg: <code>brew install ffmpeg</code></li>
-        </ol>
-      </details>
-
-      <details class="topic">
-        <summary>Install on Linux</summary>
-        <ol class="steps">
-          <li>Download the <a href="https://github.com/ArianARahimi/queenfisher/releases/latest/download/Queenfisher-Linux.AppImage">AppImage</a>.</li>
-          <li>Make it executable: <code>chmod +x Queenfisher-Linux.AppImage</code>, then run it.</li>
-          <li>Install ffmpeg from your package manager.</li>
-        </ol>
-      </details>
-
-      <details class="topic">
-        <summary>Download a video</summary>
-        <ol class="steps">
-          <li>Copy the video's link and click Paste (or press Ctrl+Shift+V).</li>
-          <li>Pick a format and a quality on the left. Qualities the video doesn't have are greyed out.</li>
-          <li>Click Download. Add more while it runs; they wait their turn.</li>
-        </ol>
-        <p>Files go to your Downloads folder. Change... next to "Save to" picks another one, and
-          Queenfisher remembers it.</p>
-      </details>
+      <p class="sub">Features</p>
 
       <details class="topic">
         <summary>Which format should I pick?</summary>
@@ -155,12 +112,18 @@
       </details>
 
       <details class="topic">
-        <summary>Extras: subtitles, playlists, sponsors</summary>
+        <summary>Subtitles, playlists and sponsors</summary>
         <dl class="facts how">
           <dt>Subtitles:</dt><dd>English subtitles inside the video, when the site has them (MP4, MKV, WebM).</dd>
           <dt>Whole playlist:</dt><dd>a link from a playlist downloads every video in it.</dd>
           <dt>Skip sponsors:</dt><dd>cuts sponsored segments out of YouTube videos, using the SponsorBlock community's list.</dd>
         </dl>
+      </details>
+
+      <details class="topic">
+        <summary>Where downloads go</summary>
+        <p>Your Downloads folder. Change... next to "Save to" picks another one, and Queenfisher
+          remembers it, along with your format, quality and extras.</p>
       </details>
 
       <details class="topic">
@@ -170,20 +133,62 @@
       </details>
 
       <details class="topic">
-        <summary>Keeping yt-dlp working</summary>
-        <p>Sites change all the time, and yt-dlp keeps up. Queenfisher fetches official yt-dlp
-          releases, checks the developers' signature, and looks for a new one once a day. When a
-          download fails because a site changed, it updates yt-dlp and tries again by itself.</p>
+        <summary>The Library</summary>
+        <p>Every finished download, newest first. Search it, open a file, or show it in its
+          folder. Files you delete or move disappear from it by themselves.</p>
       </details>
 
       <details class="topic">
-        <summary>If something goes wrong</summary>
+        <summary>Keeping it running in the tray</summary>
+        <p>Minimizing (or View, Minimize to Tray) hides Queenfisher in the system tray while
+          downloads carry on. Click the fish to bring it back.</p>
+      </details>
+
+      <p class="sub">Troubleshooting</p>
+
+      <details class="topic">
+        <summary>Windows says it protected my PC</summary>
+        <p>Windows warns about new programs it hasn't seen often. Click More info, then Run anyway.
+          Every release is checked on VirusTotal before it's published.</p>
+      </details>
+
+      <details class="topic">
+        <summary>macOS says it can't be opened</summary>
+        <p>Click Done, then open System Settings, Privacy &amp; Security, and click Open Anyway near
+          the bottom. macOS asks only the first time.</p>
+      </details>
+
+      <details class="topic">
+        <summary>It says ffmpeg is missing (macOS, Linux)</summary>
+        <p>Install it once: <code>brew install ffmpeg</code> on macOS, or from your package manager
+          on Linux. On Windows Queenfisher fetches its own.</p>
+      </details>
+
+      <details class="topic">
+        <summary>A download failed</summary>
         <ul class="list">
-          <li>The Status column says what happened. Log, under the downloads, shows the details.</li>
-          <li>Select a failed download and click Retry.</li>
-          <li>On Linux, a video that needs a sign-in uses your browser's, once you're signed in there.</li>
-          <li>Still stuck? <a href="https://github.com/ArianARahimi/queenfisher/issues">Open an issue on GitHub</a>.</li>
+          <li>The Status column says what happened; Log, under the downloads, shows the details.</li>
+          <li>Select it and click Retry. When a site has changed, Queenfisher updates yt-dlp by itself first.</li>
         </ul>
+      </details>
+
+      <details class="topic">
+        <summary>YouTube asks me to sign in</summary>
+        <p>Queenfisher tries once more with your default browser's sign-in, so sign in to YouTube
+          there. On Windows, Chrome and Edge often lock their sign-in away from other programs; a
+          Firefox-based browser works.</p>
+      </details>
+
+      <details class="topic">
+        <summary>YouTube only offers low qualities</summary>
+        <p>YouTube needs Deno for its better qualities. Queenfisher fetches it by itself; if that
+          failed (it says so when it starts), check your connection and restart Queenfisher.</p>
+      </details>
+
+      <details class="topic">
+        <summary>Still stuck?</summary>
+        <p><a href="https://github.com/ArianARahimi/queenfisher/issues">Open an issue on GitHub</a>
+          with what you tried and what the Log says.</p>
       </details>
     </div>
   </article>
