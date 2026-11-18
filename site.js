@@ -86,7 +86,17 @@ document.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  for (const p of document.querySelectorAll(".pick[open]")) p.open = false;
   for (const d of downloads) d.open = false;
+});
+
+// tiles with more than one download (macOS): one open at a time, closed by a choice or a
+// click anywhere else.
+document.addEventListener("click", (e) => {
+  for (const p of document.querySelectorAll(".pick[open]")) {
+    if (!p.contains(e.target)) p.open = false;
+    else if (e.target.closest(".pick-menu a")) setTimeout(() => { p.open = false; });
+  }
 });
 
 // project windows: clicking the window opens its page. Download and Source

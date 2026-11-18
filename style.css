@@ -368,6 +368,51 @@ code { font: inherit; color: var(--yellow); }
 .dos-menu .note { color: var(--dark-grey); }
 .dos-menu a:hover .note, .dos-menu a:focus-visible .note { color: var(--grey); }
 
+/* a tile with more than one download (macOS: Apple Silicon or Intel): it opens a small
+   menu under itself, in the same style; a choice, a click elsewhere or Escape closes it */
+.pick { position: relative; }
+.pick > summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 80px;
+  padding: 8px 0;
+  color: var(--bg);
+  cursor: pointer;
+  list-style: none;
+}
+.pick > summary::-webkit-details-marker { display: none; }
+.pick > summary > span:not(.icon) { padding: 0 4px; }
+.pick > summary:hover, .pick > summary:focus-visible, .pick[open] > summary { color: var(--yellow); outline: none; }
+.pick > summary:hover > span:not(.icon), .pick > summary:focus-visible > span:not(.icon),
+.pick[open] > summary > span:not(.icon) { background: var(--dark-blue); }
+.pick > summary:hover .key, .pick[open] > summary .key { color: var(--text); }
+.pick > summary:hover .note, .pick[open] > summary .note { color: var(--grey); }
+.pick-menu {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--grey);
+  border: 4px double var(--bg);
+  box-shadow: 8px 8px 0 var(--dark-grey);
+}
+.pick-menu a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: auto;
+  padding: 4px 8px;
+  white-space: nowrap;
+  color: var(--bg);
+}
+.pick-menu a .note { color: var(--dark-grey); }
+
 /* icons: 32x32 pixel art shown 1:1 so its pixels match the font's.
    16x16 art also works and is doubled. */
 .icon {
@@ -383,5 +428,6 @@ code { font: inherit; color: var(--yellow); }
 
 /* small phones: narrower tiles so the download window fits a 320px screen */
 @media (max-width: 420px) {
-  .dos-menu a { width: 72px; }
+  .dos-menu a, .pick > summary { width: 72px; }
+  .pick-menu a { width: auto; }
 }
