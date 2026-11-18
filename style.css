@@ -222,6 +222,11 @@ footer.site p + p { margin-top: 4px; }
 .list li { padding-left: 2ch; text-indent: -2ch; margin-bottom: 4px; }
 .list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
 .shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); align-self: center; }
+/* screenshots: one wide, two side by side under it */
+.shots figure { margin: 0 0 16px; }
+.shots figcaption { margin-top: 6px; color: var(--grey); }
+.shots-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .shots-row { grid-template-columns: 1fr; } }
 @media (max-width: 760px) {
   .project-body { grid-template-columns: 1fr; }
 }
