@@ -224,9 +224,16 @@ footer.site p + p { margin-top: 4px; }
 .list li { padding-left: 2ch; text-indent: -2ch; margin-bottom: 4px; }
 .list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
 .shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); align-self: center; }
-/* a wide window screenshot: the window's full width, between the description and the details */
-.shot-wide { display: block; margin: 8px 0 24px; }
-.shot-wide .shot { width: 100%; }
+/* project page: screenshots in their own windows on the left, About on the right */
+.about-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; align-items: start; margin-bottom: 40px; }
+.about-row .win.project { margin-bottom: 0; }
+.shot-col { display: flex; flex-direction: column; gap: 32px; }
+.shot-win a { display: block; padding: 20px 8px 8px; }
+.shot-win img { display: block; width: 100%; height: auto; }
+@media (max-width: 760px) {
+  .about-row { grid-template-columns: 1fr; gap: 32px; }
+  .shot-col { order: 1; }   /* on phones the description comes first */
+}
 @media (max-width: 760px) {
   .project-body { grid-template-columns: 1fr; }
 }
