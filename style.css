@@ -229,11 +229,12 @@ footer.site p + p { margin-top: 4px; }
 .list li::before { content: "\00bb"; display: inline-block; width: 2ch; text-indent: 0; color: var(--bright-cyan); }
 .shot { display: block; max-width: 100%; height: auto; border: 2px solid var(--blue); align-self: center; }
 /* project page: About on the left, screenshots in their own windows on the right */
-.about-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; align-items: start; margin-bottom: 40px; }
+.about-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 0 32px; align-items: stretch; margin-bottom: 40px; }
 .about-row .win.project { margin-bottom: 0; }
 .shot-col { display: flex; flex-direction: column; gap: 32px; }
 .shot-win a { display: block; padding: 8px; }   /* no title bar: the picture speaks for itself */
 .shot-win img { display: block; width: 100%; height: auto; }
+.shot-win a + a { padding-top: 0; }   /* one 8px gap between stacked shots */
 @media (max-width: 760px) {
   .about-row { grid-template-columns: 1fr; gap: 32px; }
 }
