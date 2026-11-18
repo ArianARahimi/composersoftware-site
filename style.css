@@ -147,9 +147,8 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   position: absolute;
   inset: 8px -8px -8px 8px;
   z-index: -1;
-  background: repeating-conic-gradient(var(--frame, var(--blue)) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+  background: repeating-conic-gradient(var(--blue) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
 }
-.button::after { background: repeating-conic-gradient(var(--blue) 0 25%, transparent 0 50%) 0 0 / 4px 4px; }
 
 .section, .page { margin-bottom: 32px; color: var(--yellow); }
 .page { font-size: 32px; line-height: 1; }
@@ -183,7 +182,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--frame, var(--blue));
+  border: 2px solid var(--blue);
   background: var(--bg);
 }
 .win::after { inset: 8px -10px -10px 8px; }
@@ -196,19 +195,13 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   justify-content: space-between;
   line-height: 1;
 }
-.win-bar h2 { padding: 0 8px; color: var(--bg); background: var(--chip, var(--light-blue)); }
+.win-bar h2 { padding: 0 8px; color: var(--bg); background: var(--light-blue); }
 .win-tag { padding: 0 8px; color: var(--bg); background: var(--green); }
 .win-tag.wip { background: var(--magenta); }
 .win-tags { display: flex; gap: 8px; }
 
-/* each project has its own colours (Tango pairs), on its cards and all over its own page,
-   so the Projects list and the projects in it can't be mistaken for each other */
-.p-queenfisher { --frame: #4e9a06; --chip: #8ae234; }
-.p-vtq { --frame: #ce5c00; --chip: #fcaf3e; }
-.p-queenfisher .page, .p-vtq .page, .page.p-queenfisher, .page.p-vtq { color: var(--chip); }
-.kind { margin-bottom: 12px; color: var(--chip, var(--grey)); }
-.page + .kind { margin: -20px 0 32px; }
-.rule { height: 0; margin: 0 0 16px; border: 0; border-top: 2px solid var(--frame, var(--blue)); }
+.kind { margin-bottom: 12px; color: var(--grey); }   /* what a project is, at the top of its card */
+.rule { height: 0; margin: 0 0 16px; border: 0; border-top: 2px solid var(--blue); }
 .facts + .rule { margin-top: 16px; }   /* lists have no space of their own below */
 .win-tag.new { background: var(--yellow); }   /* the newest project */
 .win-body { flex: 1; padding: 24px 16px 20px; }
@@ -267,7 +260,7 @@ footer.site p + p { margin-top: 4px; }
 .wide-note { margin-bottom: 40px; }
 .about-win { max-width: 720px; margin-bottom: 40px; }
 .how { row-gap: 8px; }
-.sub { margin: 24px 0 12px; padding-bottom: 4px; border-bottom: 2px solid var(--frame, var(--blue)); color: var(--chip, var(--light-blue)); }
+.sub { margin: 24px 0 12px; padding-bottom: 4px; border-bottom: 2px solid var(--blue); color: var(--light-blue); }
 
 /* bottom of every page: the way back without scrolling up */
 .foot-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 24px; }
