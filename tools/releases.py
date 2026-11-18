@@ -47,7 +47,7 @@ def section(body):
         if re.match(r"#+\s*(what'?s new|changes|changelog)\b", line.strip(), re.I):
             rest = []
             for more in lines[i + 1:]:
-                if more.startswith("#") or (not more.strip() and any(r.strip() for r in rest)):
+                if more.startswith("#"):
                     break
                 rest.append(more)
             return "\n".join(rest).strip() or None
@@ -55,8 +55,20 @@ def section(body):
 
 
 def bullets(text):
-    items = [re.sub(r"^[-*]\s+", "", l.strip()) for l in text.split("\n") if l.strip()]
-    return "<ul class=\"list\">" + "".join(f"<li>{inline(i)}</li>" for i in items) + "</ul>"
+    """List lines (- or *) become a list; other lines stay paragraphs."""
+    out, items = [], []
+    for l in (l.strip() for l in text.split("\n")):
+        if re.match(r"[-*]\s+", l):
+            items.append(f"<li>{inline(l[1:].strip())}</li>")
+            continue
+        if items:
+            out.append('<ul class="list">' + "".join(items) + "</ul>")
+            items = []
+        if l:
+            out.append(f"<p>{inline(l)}</p>")
+    if items:
+        out.append('<ul class="list">' + "".join(items) + "</ul>")
+    return "\n".join(out)
 
 
 def whats_new(repo, rel, releases):
