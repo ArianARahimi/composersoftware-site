@@ -234,6 +234,7 @@ footer.site p + p { margin-top: 4px; }
 .shot-col { display: flex; flex-direction: column; gap: 32px; }
 .shot-win a { display: block; padding: 8px; }   /* no title bar: the picture speaks for itself */
 .shot-win img { display: block; width: 100%; height: auto; }
+.shot-cap { margin: 0; padding: 0 8px 8px; color: var(--grey); }
 @media (max-width: 760px) {
   .about-row { grid-template-columns: 1fr; gap: 32px; }
 }
