@@ -4,9 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # daily, so new releases of the projects show up on their own
+  # hourly, so new releases show up on their own and a NEW! badge leaves the page
+  # within the hour its 72 hours end
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 * * * *"
 
 permissions:
   contents: read

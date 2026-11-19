@@ -40,8 +40,8 @@ screenshot. A new page gets the same.
 (`projects/<name>.html`, served as `/projects/<name>`). The home page shows the
 latest one under Latest.
 
-Release info comes from GitHub when the site is built (on every push and once a
-day): `tools/releases.py` fills in any element marked
+Release info comes from GitHub when the site is built (on every push and every
+hour): `tools/releases.py` fills in any element marked
 `<span class="release" data-repo="OWNER/REPO" data-view="tag">…</span><!--/release-->`
 (`tag` = version and date, `notes` = what's new with a link). What's new is the
 release notes' "What's new" section if there is one, otherwise the commit titles

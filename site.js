@@ -176,7 +176,8 @@ if (title && intro.contains("intro")) {
 }
 
 // NEW!: shown on a project for its first 72 hours after its first release (the build writes
-// the time). It rises once the tagline has typed, drops behind the name while the project is
+// the time, and leaves the badge out altogether after that). It rises once the tagline has
+// typed (on the Projects page, just after loading), drops behind the name while the project is
 // pointed at, and rises and types out again after. The rise and drop are a CSS transition, so
 // pointing on and off quickly reverses it from where it is instead of starting over.
 const tagline = document.querySelector(".type");
@@ -186,10 +187,13 @@ for (const date of document.querySelectorAll(".new-date")) {
   if (!badge || !(age < 72 * 3600 * 1000)) continue;
   badge.hidden = false;
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const links = [...badge.closest("li").querySelectorAll(".latest-title, .latest-text")];
+  // pointed at: a Latest row's links, or a project window lit up to open (or its title focused)
+  const card = badge.closest(".card-link");
+  const links = card ? [card.querySelector(".card-title")] : [...badge.closest("li").querySelectorAll(".latest-title, .latest-text")];
+  const pointed = () => (card && card.classList.contains("hot")) || links.some((l) => l.matches(card ? ":focus-visible" : ":hover, :focus-visible"));
   let ready = false;
   const update = () => {
-    const up = ready && !links.some((l) => l.matches(":hover, :focus-visible"));
+    const up = ready && !pointed();
     badge.classList.toggle("up", up);
     if (still) badge.classList.toggle("typed", up);   // no transition, so no transitionend
   };
@@ -200,7 +204,8 @@ for (const date of document.querySelectorAll(".new-date")) {
   for (const link of links) {
     for (const event of ["mouseenter", "mouseleave", "focus", "blur"]) link.addEventListener(event, () => setTimeout(update));
   }
+  if (card) new MutationObserver(update).observe(card, { attributeFilter: ["class"] });   // lit up or not
   const start = () => { if (!ready) { ready = true; update(); } };
   if (tagline && !still) tagline.addEventListener("animationend", start, { once: true });
-  setTimeout(start, still ? 0 : 2400);   // in case the tagline's end is missed
+  setTimeout(start, still ? 0 : tagline ? 2400 : 400);   // with a tagline: in case its end is missed
 }

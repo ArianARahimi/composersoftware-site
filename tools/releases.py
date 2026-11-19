@@ -17,6 +17,8 @@ a line saying just "Overhaul" (a major update that remakes the project).
 What's new is the release notes' "What's new" (or "Changes"/"Changelog")
 section when there is one, otherwise the commit titles since the release
 before it. If GitHub can't be reached, the fallback text stays.
+A NEW! badge marked <!--new-->...<!--/new--> (holding a first-iso release time) is left
+out of the page altogether once that first release is 72 hours old.
 It also writes feed.xml (Atom): the releases of every project marked on the pages, newest
 first, for feed readers.
 """
@@ -175,6 +177,25 @@ def newest_first(text, cache):
     return LIST.sub(sort, text)
 
 
+NEW = re.compile(r"<!--new-->(.*?)<!--/new-->", re.S)
+FIRST_ISO = re.compile(r'data-view="first-iso">([^<]*)<')
+NEW_HOURS = 72
+
+
+def drop_old_badges(text, now=None):
+    """Removes NEW! badges whose project was first released NEW_HOURS or more ago (or has no
+    readable time), and the markers from the ones that stay."""
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    def keep(m):
+        found = FIRST_ISO.search(m[1])
+        try:
+            first = datetime.datetime.fromisoformat(found[1].replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            return ""
+        return m[1] if now - first < datetime.timedelta(hours=NEW_HOURS) else ""
+    return NEW.sub(keep, text)
+
+
 SITE = "https://composersoftware.net"
 NAMES = {"vt-quarantine": "VirusTotal Quarantine", "queenfisher": "Queenfisher"}   # repo -> name in the feed
 FEED_SIZE = 20
@@ -237,7 +258,7 @@ def main(folder):
                     new = None
                 return m[1] + (new if new is not None else m[4]) + m[5]
 
-            new_text = newest_first(MARK.sub(fill, text), cache)
+            new_text = drop_old_badges(newest_first(MARK.sub(fill, text), cache))
             if new_text != text:
                 open(path, "w", encoding="utf-8").write(new_text)
                 print("release info:", os.path.relpath(path, folder))

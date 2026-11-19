@@ -234,6 +234,10 @@ body > footer.site { width: 100%; }   /* auto side margins would shrink these to
   transition: transform 0.2s steps(7);
 }
 .has-new .new.up { transform: none; }
+/* on a project window: behind the title label on the frame, hidden exactly inside its 16px */
+.win-bar .has-new h2 { position: relative; z-index: 1; }
+.win-bar .has-new .new { transform: translateY(12px); transition-timing-function: steps(6); }
+.win-bar .has-new .new.up { transform: none; }
 .new-text {
   display: inline-block;   /* as wide as its text: each typing step shows a quarter, one character */
   vertical-align: top;
@@ -246,7 +250,7 @@ body > footer.site { width: 100%; }   /* auto side margins would shrink these to
 @keyframes new-type { from { clip-path: inset(0 100% 0 0); } }   /* one character per step */
 @keyframes new-blink { 50% { color: var(--yellow); } }
 @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
-  .has-new .new { transition: none; }
+  .has-new .new, .win-bar .has-new .new { transition: none; }
   .new.typed .new-text { animation: none; }
 }
 .latest .dos-wrap { left: auto; right: 0; }   /* opens leftwards: the last column is near the edge */
