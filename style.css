@@ -191,12 +191,12 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
 .latest-title:hover, .latest-title:focus-visible { color: var(--bg); background: var(--yellow); }
 .latest-version { color: var(--bright-cyan); }
-/* NEW!: pops up onto the name's top-right corner, types itself out, blinks 3 times, stays */
+/* NEW!: pops up on the name's top-left corner (left edges lined up), types itself out, blinks 3 times, stays */
 .has-new { position: relative; }
 .has-new .new {
   position: absolute;
-  left: calc(100% - 8px);
-  bottom: calc(100% - 6px);
+  left: 0;
+  bottom: calc(100% - 4px);
   line-height: 16px;
   white-space: nowrap;
   animation: new-wait 0.8s steps(1), new-pop 0.15s steps(2) 0.8s both, new-blink 0.4s steps(1) 1.45s 3;
