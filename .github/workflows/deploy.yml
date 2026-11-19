@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
   # hourly, so new releases show up on their own and a NEW! badge leaves the page
-  # within the hour its 72 hours end
+  # within the hour its two weeks end
   schedule:
     - cron: "17 * * * *"
 
