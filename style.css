@@ -191,26 +191,28 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
 .latest-title:hover, .latest-title:focus-visible { color: var(--bg); background: var(--yellow); }
 .latest-version { color: var(--bright-cyan); }
-/* NEW!: pops up on the name's top-left corner (left edges lined up), types itself out, blinks 3 times, stays */
+/* NEW!: the yellow bar rises from behind the name (left edges lined up), the text types out
+   inside it, then blinks 3 times: black to the bar's yellow and back. The bar never changes. */
 .has-new { position: relative; }
+.has-new .latest-title { position: relative; z-index: 1; }   /* in front of the bar */
 .has-new .new {
   position: absolute;
   left: 0;
   bottom: calc(100% - 4px);
   line-height: 16px;
   white-space: nowrap;
-  animation: new-wait 0.8s steps(1), new-pop 0.15s steps(2) 0.8s both, new-blink 0.4s steps(1) 1.45s 3;
+  animation: new-rise 0.2s steps(7) 0.8s both;
 }
 .new-text {
   display: inline-block;
   width: 32px; /* 4 characters of 8px, like the tagline */
-  overflow: hidden;
   vertical-align: top;
-  animation: type 0.4s steps(4) 0.95s both;
+  clip-path: inset(0 0 0 0);   /* so the typing steps clip to clip (from "none" it jumps) */
+  animation: new-type 0.4s steps(4) 1s both, new-blink 0.4s steps(1) 1.45s 3;
 }
-@keyframes new-wait { from { visibility: hidden; } }
-@keyframes new-pop { from { transform: translateY(8px); } }
-@keyframes new-blink { 50% { visibility: hidden; } }
+@keyframes new-rise { from { transform: translateY(14px); } }   /* 14px down: hidden behind the name */
+@keyframes new-type { from { clip-path: inset(0 100% 0 0); } }   /* one 8px character per step */
+@keyframes new-blink { 50% { color: var(--yellow); } }
 @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
   .has-new .new, .new-text { animation: none; }
 }
