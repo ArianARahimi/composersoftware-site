@@ -41,7 +41,7 @@ screenshot. A new page gets the same.
 latest one under Latest.
 
 Release info comes from GitHub when the site is built (on every push and every
-hour): `tools/releases.py` fills in any element marked
+week): `tools/releases.py` fills in any element marked
 `<span class="release" data-repo="OWNER/REPO" data-view="tag">…</span><!--/release-->`
 (`tag` = version and date, `notes` = what's new with a link). What's new is the
 release notes' "What's new" section if there is one, otherwise the commit titles

@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # hourly, so new releases show up on their own and a NEW! badge leaves the page
-  # within the hour its two weeks end
+  # weekly (Mondays), so new releases show up on their own and expired NEW! badges
+  # leave the page (site.js already hides them on time)
   schedule:
-    - cron: "17 * * * *"
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read
