@@ -17,7 +17,10 @@ a line saying just "Overhaul" (a major update that remakes the project).
 What's new is the release notes' "What's new" (or "Changes"/"Changelog")
 section when there is one, otherwise the commit titles since the release
 before it. If GitHub can't be reached, the fallback text stays.
+It also writes feed.xml (Atom): the releases of every project marked on the pages, newest
+first, for feed readers.
 """
+import datetime
 import html
 import json
 import os
@@ -172,14 +175,59 @@ def newest_first(text, cache):
     return LIST.sub(sort, text)
 
 
+SITE = "https://composersoftware.net"
+NAMES = {"vt-quarantine": "VirusTotal Quarantine", "queenfisher": "Queenfisher"}   # repo -> name in the feed
+FEED_SIZE = 20
+
+
+def feed(folder, repos, cache):
+    """feed.xml: the projects' releases, newest first. A project GitHub won't give is left out."""
+    found = []
+    for repo in sorted(repos):
+        try:
+            found += [(repo, r) for r in all_releases(repo, cache)]
+        except Exception as e:  # never break the build
+            print(f"warning: feed: {repo}: {e}", file=sys.stderr)
+    found = sorted(found, key=lambda p: p[1]["published_at"], reverse=True)[:FEED_SIZE]
+    esc = lambda t: html.escape(t, quote=True)
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    entries = []
+    for repo, r in found:
+        name = NAMES.get(repo.split("/")[1], repo.split("/")[1])
+        notes = section(r.get("body") or "")
+        body = (bullets(notes) + "\n" if notes else "") + f'<p><a href="{esc(r["html_url"])}">Release notes on GitHub</a></p>'
+        entries.append(f"""<entry>
+  <title>{esc(name + " " + r["tag_name"])}</title>
+  <id>{esc(r["html_url"])}</id>
+  <link href="{esc(r["html_url"])}"/>
+  <updated>{esc(r["published_at"])}</updated>
+  <content type="html">{esc(body)}</content>
+</entry>
+""")
+    updated = found[0][1]["published_at"] if found else now
+    text = f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Composer Software releases</title>
+<id>{SITE}/feed.xml</id>
+<link rel="self" href="{SITE}/feed.xml"/>
+<link href="{SITE}/"/>
+<updated>{esc(updated)}</updated>
+<author><name>Composer Software</name></author>
+{"".join(entries)}</feed>
+"""
+    open(os.path.join(folder, "feed.xml"), "w", encoding="utf-8").write(text)
+    print(f"feed: {len(found)} releases")
+
+
 def main(folder):
-    cache = {}
+    cache, repos = {}, set()
     for root, _, files in os.walk(folder):
         for name in files:
             if not name.endswith(".html"):
                 continue
             path = os.path.join(root, name)
             text = open(path, encoding="utf-8").read()
+            repos.update(m[2] for m in MARK.finditer(text))
 
             def fill(m):
                 try:
@@ -193,6 +241,7 @@ def main(folder):
             if new_text != text:
                 open(path, "w", encoding="utf-8").write(new_text)
                 print("release info:", os.path.relpath(path, folder))
+    feed(folder, repos, cache)
 
 
 if __name__ == "__main__":

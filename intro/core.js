@@ -186,13 +186,19 @@ function sheen(h, done) {
   const longest = Math.max(...lines.map((l) => l.length));
   const pass = (longest + lines.length - 1) * STEP;     // one full sweep
   const hold = pass + 60;                               // white until the second sweep
+  // timings set through .style: the site's security policy blocks style="" in markup
+  const delays = [];
   h.innerHTML = lines.map((line, row) =>
     [...line].map((ch, col) => {
-      const delay = (line.length - 1 - col + lines.length - 1 - row) * STEP;
-      return `<span class="sheen-ch" style="animation-delay:${delay}ms;animation-duration:${hold}ms">${ch}</span>`;
+      delays.push((line.length - 1 - col + lines.length - 1 - row) * STEP);
+      return `<span class="sheen-ch">${ch}</span>`;
     }).join("")
   ).join("<br>");
   const letters = h.querySelectorAll(".sheen-ch");
+  letters.forEach((l, i) => {
+    l.style.animationDelay = delays[i] + "ms";
+    l.style.animationDuration = hold + "ms";
+  });
   let left = letters.length;
   h.addEventListener("animationend", function ended() {
     if (--left > 0) return;

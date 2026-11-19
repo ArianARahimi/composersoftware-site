@@ -26,6 +26,14 @@ those; a local preview server may need the `.html` typed in.
 When `style.css`, `site.js`, `backdrop.js` or anything in `intro/` changes, raise the `?v=` number in the HTML files
 so browsers don't mix a cached old file with the new pages.
 
+Every page has a security policy (CSP) meta tag: only the site's own files, plus its inline
+`<script>`/`<style>` blocks by hash. After changing an inline block, run `python3 tools/csp.py . --fix`
+(the deploy checks it, then reapplies it to the finished build). `style=""` in markup is blocked;
+set styles from scripts with `.style`.
+
+Every page has share tags (`og:`, `twitter:card`) for link previews; a project page also names its
+screenshot. A new page gets the same.
+
 ## Projects
 
 `projects/index.html` lists every project as a window that links to its own page
@@ -37,7 +45,10 @@ day): `tools/releases.py` fills in any element marked
 `<span class="release" data-repo="OWNER/REPO" data-view="tag">…</span><!--/release-->`
 (`tag` = version and date, `notes` = what's new with a link). What's new is the
 release notes' "What's new" section if there is one, otherwise the commit titles
-since the previous release. For a new project, add the same markers.
+since the previous release. For a new project, add the same markers, and its name in
+`NAMES` in `tools/releases.py` for the feed. The build also writes `feed.xml`, an Atom feed of
+every project's releases (linked from each page's head). The Projects page and the home
+page's Latest are put newest project first the same way (`<!--latest-->`/`<!--item-->` markers).
 
 ## Download icons
 

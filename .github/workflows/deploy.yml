@@ -35,11 +35,13 @@ jobs:
 
       - name: Build
         run: |
+          python3 tools/csp.py .   # every page's security policy matches its inline code
           mkdir _site
           # Hidden files never go live: an accidentally committed .env or the like stays off the site.
           rsync -a --exclude '.*' --exclude private --exclude _site --exclude tools --exclude README.md ./ _site/
           sh private/build.sh _site
           python3 tools/releases.py _site
+          python3 tools/csp.py _site --fix   # policies for what the steps above added
         env:
           GH_TOKEN: ${{ github.token }}
 
