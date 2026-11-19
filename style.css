@@ -194,7 +194,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   grid-template-columns: max-content 1fr 7ch max-content;
   gap: 0 3ch;
   align-items: baseline;
-  padding: 12px 0;
+  padding: 16px 0 12px;   /* room above for a NEW! badge */
 }
 .latest > li + li { border-top: 2px solid var(--blue); }
 .latest-name { display: flex; gap: 1ch; margin-right: -1ch; }   /* 2ch to the text, 3ch between the rest */
@@ -208,6 +208,9 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-text {
   color: var(--green);
   text-decoration: underline;
+}
+.latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .new {
+  visibility: hidden;   /* NEW! steps aside while the project is pointed at */
 }
 .latest-version { color: var(--bright-cyan); }
 /* NEW!: the yellow bar rises from behind the name (left edges lined up), the text types out

@@ -7,6 +7,7 @@ Any element written like
   <span class="release" data-repo="OWNER/REPO" data-view="tag">fallback</span><!--/release-->
 gets the latest release of OWNER/REPO. Views:
   version  "v1.2.3"
+  iso      "2026-01-31T12:00:00Z", for scripts
   tag      "v1.2.3, 2026-01-31"
   notes    version, date, what's new and a link to the release
 Items marked <!--item OWNER/REPO-->...<!--/item--> inside <!--latest-->...<!--/latest-->
@@ -97,6 +98,8 @@ def render(repo, view, cache):
     tag, date = html.escape(rel["tag_name"]), rel["published_at"][:10]
     if view == "version":
         return tag
+    if view == "iso":
+        return html.escape(rel["published_at"])   # for scripts: when it was released
     if view == "tag":
         return f"{tag}, {date}"
     if view == "notes":

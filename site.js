@@ -174,3 +174,10 @@ if (title && intro.contains("intro")) {
   // never leave the title hidden if scripts or fonts are slow
   setTimeout(() => { if (!title.querySelector(".raster")) skip(); }, 1500);
 }
+
+// NEW!: shown on a project for 72 hours after its latest release (the build writes the time)
+for (const date of document.querySelectorAll(".new-date")) {
+  const badge = date.parentElement.querySelector(".new");
+  const age = Date.now() - Date.parse(date.textContent);
+  if (badge && age < 72 * 3600 * 1000) badge.hidden = false;
+}
