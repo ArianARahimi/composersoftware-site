@@ -36,7 +36,8 @@ jobs:
       - name: Build
         run: |
           mkdir _site
-          rsync -a --exclude .git --exclude .github --exclude private --exclude _site --exclude tools --exclude README.md ./ _site/
+          # Hidden files never go live: an accidentally committed .env or the like stays off the site.
+          rsync -a --exclude '.*' --exclude private --exclude _site --exclude tools --exclude README.md ./ _site/
           sh private/build.sh _site
           python3 tools/releases.py _site
         env:
