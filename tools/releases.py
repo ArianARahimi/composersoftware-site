@@ -6,8 +6,11 @@ Usage: python3 tools/releases.py <site folder>
 Any element written like
   <span class="release" data-repo="OWNER/REPO" data-view="tag">fallback</span><!--/release-->
 gets the latest release of OWNER/REPO. Views:
-  tag    "v1.2.3, 2026-01-31"
-  notes  version, date, what's new and a link to the release
+  version  "v1.2.3"
+  tag      "v1.2.3, 2026-01-31"
+  notes    version, date, what's new and a link to the release
+Items marked <!--item OWNER/REPO-->...<!--/item--> inside <!--latest-->...<!--/latest-->
+are put in order of their latest release, newest first.
 What's new is the release notes' "What's new" (or "Changes"/"Changelog")
 section when there is one, otherwise the commit titles since the release
 before it. If GitHub can't be reached, the fallback text stays.
@@ -92,6 +95,8 @@ def render(repo, view, cache):
         return None
     rel, releases = cache[repo]
     tag, date = html.escape(rel["tag_name"]), rel["published_at"][:10]
+    if view == "version":
+        return tag
     if view == "tag":
         return f"{tag}, {date}"
     if view == "notes":
@@ -100,6 +105,31 @@ def render(repo, view, cache):
                 f"{notes}\n"
                 f'<p><a href="{html.escape(rel["html_url"])}">Release notes on GitHub</a></p>')
     return None
+
+
+LIST = re.compile(r"(<!--latest-->)(.*?)(<!--/latest-->)", re.S)
+ITEM = re.compile(r"<!--item ([\w.-]+/[\w.-]+)-->.*?<!--/item-->", re.S)
+
+
+def newest_first(text, cache):
+    """Inside <!--latest-->...<!--/latest-->, puts the <!--item OWNER/REPO--> blocks in
+    order of their latest release, newest first. Any date missing: the order stays."""
+    def sort(m):
+        items = [(i[1], i[0]) for i in ITEM.finditer(m[2])]
+        dates = []
+        for repo, _ in items:
+            try:
+                render(repo, "tag", cache)   # fills the cache
+                dates.append(cache[repo][0]["published_at"] if cache[repo] else None)
+            except Exception as e:  # keep the order, never break the build
+                print(f"warning: {repo}: {e}", file=sys.stderr)
+                dates.append(None)
+        if not items or None in dates:
+            return m[0]
+        ordered = [block for _, (_, block) in sorted(zip(dates, items), key=lambda p: p[0], reverse=True)]
+        gaps = re.split(r"<!--item [\w.-]+/[\w.-]+-->.*?<!--/item-->", m[2], flags=re.S)
+        return m[1] + "".join(g + b for g, b in zip(gaps, ordered)) + gaps[-1] + m[3]
+    return LIST.sub(sort, text)
 
 
 def main(folder):
@@ -119,7 +149,7 @@ def main(folder):
                     new = None
                 return m[1] + (new if new is not None else m[4]) + m[5]
 
-            new_text = MARK.sub(fill, text)
+            new_text = newest_first(MARK.sub(fill, text), cache)
             if new_text != text:
                 open(path, "w", encoding="utf-8").write(new_text)
                 print("release info:", os.path.relpath(path, folder))

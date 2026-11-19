@@ -177,6 +177,27 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 /* cards: fixed widths so text stays on whole pixels */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
 
+/* home page Latest: one line per project, newest on top; columns in whole characters */
+.latest { margin: 0; padding: 0; list-style: none; }
+.latest > li {
+  display: grid;
+  grid-template-columns: 24ch 60ch 7ch max-content;
+  gap: 0 3ch;
+  align-items: baseline;
+  padding: 12px 0;
+}
+.latest > li + li { border-top: 2px solid var(--blue); }
+.latest-name { display: flex; gap: 1ch; }
+.latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
+.latest-title:hover, .latest-title:focus-visible { color: var(--bg); background: var(--yellow); }
+.latest-version { color: var(--bright-cyan); }
+.latest .dos-wrap { left: auto; right: 0; }   /* opens leftwards: the last column is near the edge */
+@media (max-width: 920px) {   /* too narrow for one line: name, text, then version and Download */
+  .latest > li { display: flex; flex-wrap: wrap; gap: 8px 3ch; }
+  .latest-name, .latest-text { flex-basis: 100%; }
+  .latest .dos-wrap { left: 0; right: auto; }
+}
+
 /* ZealOS style window */
 .win {
   position: relative;
