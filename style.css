@@ -189,7 +189,15 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .latest > li + li { border-top: 2px solid var(--blue); }
 .latest-name { display: flex; gap: 1ch; }
 .latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
-.latest-title:hover, .latest-title:focus-visible { color: var(--bg); background: var(--yellow); }
+.latest-text { color: var(--text); text-decoration: none; }
+/* name and text both open the project page; pointing at either turns both RELEASED green */
+.latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-title {
+  color: var(--bg);
+  background: var(--green);
+}
+.latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-text {
+  color: var(--green);
+}
 .latest-version { color: var(--bright-cyan); }
 /* NEW!: the yellow bar rises from behind the name (left edges lined up), the text types out
    inside it, then blinks 3 times: black to the bar's yellow and back. The bar never changes. */
