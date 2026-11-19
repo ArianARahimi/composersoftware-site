@@ -178,16 +178,16 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
 
 /* home page Latest: one line per project, newest on top; columns in whole characters */
-.latest { margin: 0; padding: 0; list-style: none; }
-.latest > li {
+.latest { max-width: 105ch; margin: 0; padding: 0; list-style: none; }
+.latest > li {   /* text right after the name; version and Download line up on the right */
   display: grid;
-  grid-template-columns: 24ch 60ch 7ch max-content;
+  grid-template-columns: max-content 1fr 7ch max-content;
   gap: 0 3ch;
   align-items: baseline;
   padding: 12px 0;
 }
 .latest > li + li { border-top: 2px solid var(--blue); }
-.latest-name { display: flex; gap: 1ch; }
+.latest-name { display: flex; gap: 1ch; margin-right: -1ch; }   /* 2ch to the text, 3ch between the rest */
 .latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
 .latest-text { color: var(--text); text-decoration: none; }
 /* name and text both open the project page; pointing at either turns both RELEASED green */
@@ -197,6 +197,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 }
 .latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-text {
   color: var(--green);
+  text-decoration: underline;
 }
 .latest-version { color: var(--bright-cyan); }
 /* NEW!: the yellow bar rises from behind the name (left edges lined up), the text types out
