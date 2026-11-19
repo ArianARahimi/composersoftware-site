@@ -103,7 +103,8 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   body.home { display: flex; flex-direction: column; min-height: 100vh; }
   body.home > main { display: flex; flex-direction: column; flex: 1 0 auto; width: 100%; }
   body.home > footer.site { width: 100%; }   /* auto side margins would shrink these to their text */
-  body.home > main > .section { margin-top: auto; }
+  body.home > main { padding-bottom: 16px; }   /* a little lower; 16px still clears the window's shadow */
+  body.home > main > .latest-win { margin-top: auto; align-self: flex-start; }   /* as wide as its rows */
   body.home .latest .dos-wrap { top: auto; bottom: 28px; }   /* opens upwards: the footer is below */
 }
 
@@ -188,6 +189,7 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 40px 24px; }
 
 /* home page Latest: one line per project, newest on top; columns in whole characters */
+.latest-win .win-body { padding: 16px 16px 4px; }   /* rows bring their own spacing; room for a NEW! under the title */
 .latest { max-width: 105ch; margin: 0; padding: 0; list-style: none; }
 .latest > li {   /* text right after the name; version and Download line up on the right */
   display: grid;

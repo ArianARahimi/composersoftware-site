@@ -14,7 +14,7 @@
 <meta property="og:url" content="https://composersoftware.net/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://composersoftware.net/">
-<link rel="stylesheet" href="style.css?v=132">
+<link rel="stylesheet" href="style.css?v=133">
 <link rel="preload" href="/fonts/Px437_IBM_VGA_8x16.woff2" as="font" type="font/woff2" crossorigin>
 <script>
 // title intro (skipped for reduced motion): picked here, before the first paint,
@@ -72,8 +72,10 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     </div>
   </section>
 
-  <h2 class="section">Latest</h2>
-  <!-- tools/releases.py puts the newest release on top when the site is built -->
+  <article class="win latest-win">
+    <header class="win-bar"><h2>Latest</h2></header>
+    <!-- tools/releases.py puts the newest release on top when the site is built -->
+    <div class="win-body">
   <ul class="latest"><!--latest-->
   <!--item ArianARahimi/vt-quarantine--><li>
     <span class="latest-name"><span class="has-new"><a class="latest-title" href="/projects/vt-quarantine">VirusTotal Quarantine</a><span class="win-tag new" hidden><span class="new-text">NEW!</span></span><span class="new-date" hidden><span class="release" data-repo="ArianARahimi/vt-quarantine" data-view="iso">2026-11-19T03:27:47Z</span><!--/release--></span></span></span>
@@ -118,6 +120,8 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     </details>
   </li><!--/item-->
   <!--/latest--></ul>
+    </div>
+  </article>
 </main>
 
 <footer class="site">
