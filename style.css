@@ -202,6 +202,9 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
 .latest-name { display: flex; gap: 1ch; margin-right: -1ch; }   /* 2ch to the text, 3ch between the rest */
 .latest-title { padding: 0 1ch; color: var(--bg); background: var(--light-blue); text-decoration: none; }
 .latest-text { color: var(--text); text-decoration: none; }
+/* room for error: name and text answer across the row's full height and the gaps between columns */
+.latest-title, .latest-text { position: relative; }
+.latest-title::before, .latest-text::before { content: ""; position: absolute; inset: -16px -1ch -12px; }
 /* name and text both open the project page; pointing at either turns both RELEASED green */
 .latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-title {
   color: var(--bg);
@@ -211,12 +214,11 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   color: var(--green);
   text-decoration: underline;
 }
-.latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .new {
-  visibility: hidden;   /* NEW! steps aside while the project is pointed at */
-}
 .latest-version { color: var(--bright-cyan); }
 /* NEW!: the yellow bar rises from behind the name (left edges lined up), the text types out
-   inside it, then blinks 3 times: black to the bar's yellow and back. The bar never changes. */
+   inside it, then blinks twice: black to the bar's yellow and back. The bar never changes.
+   site.js raises it (.up) once the tagline has typed, drops it while the project is pointed
+   at and raises it again after; a transition, so a quick change reverses from where it is. */
 .has-new { position: relative; }
 .has-new .latest-title { position: relative; z-index: 1; }   /* in front of the bar */
 .has-new .new {
@@ -225,19 +227,24 @@ main { padding-top: 64px; padding-bottom: 32px; isolation: isolate; }
   bottom: calc(100% - 4px);
   line-height: 16px;
   white-space: nowrap;
-  animation: new-rise 0.2s steps(7) 0.8s backwards;   /* after it, the normal style is the end state */
+  transform: translateY(14px);   /* down: hidden behind the name */
+  transition: transform 0.2s steps(7);
 }
+.has-new .new.up { transform: none; }
 .new-text {
   display: inline-block;   /* as wide as its text: each typing step shows a quarter, one character */
   vertical-align: top;
-  clip-path: inset(0 0 0 0);   /* so the typing steps clip to clip (from "none" it jumps) */
-  animation: new-type 0.4s steps(4) 1s backwards, new-blink 0.4s steps(1) 1.45s 3;
+  clip-path: inset(0 100% 0 0);   /* no text until it's typed */
 }
-@keyframes new-rise { from { transform: translateY(14px); } }   /* 14px down: hidden behind the name */
-@keyframes new-type { from { clip-path: inset(0 100% 0 0); } }   /* one 8px character per step */
+.new.typed .new-text {   /* risen: types out (again), then blinks */
+  clip-path: inset(0 0 0 0);
+  animation: new-type 0.4s steps(4) backwards, new-blink 0.4s steps(1) 0.45s 2;
+}
+@keyframes new-type { from { clip-path: inset(0 100% 0 0); } }   /* one character per step */
 @keyframes new-blink { 50% { color: var(--yellow); } }
 @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
-  .has-new .new, .new-text { animation: none; }
+  .has-new .new { transition: none; }
+  .new.typed .new-text { animation: none; }
 }
 .latest .dos-wrap { left: auto; right: 0; }   /* opens leftwards: the last column is near the edge */
 @media (max-width: 920px) {   /* too narrow for one line: name, text, then version and Download */

@@ -177,17 +177,23 @@ function backdropStart() {
     paint(layers[1], 1, s);
   }
 
-  let frames = 0, skip = 1, frameMs = 0, clock = 0;
-  let since = -1, sinceFrames = 0, prevT = -1;
+  let frames = 0, skip = 1, frameMs = 0, clock = 0, prevT = -1;
+  const gaps = [];                                      // the last frame lengths, ms
   function tick(t) {
     requestAnimationFrame(tick);
-    if (prevT >= 0 && t - prevT > 250) since = -1;     // paused (hidden tab): start measuring again
+    const gap = prevT < 0 ? -1 : t - prevT;
     prevT = t;
-    if (since < 0) { since = t; sinceFrames = 0; }
-    else if (++sinceFrames >= (frameMs ? 120 : 30)) {  // a first guess quickly, then over longer stretches
-      frameMs = Math.min(50, Math.max(2, (t - since) / sinceFrames));
-      skip = Math.max(1, Math.round(16.7 / frameMs));
-      since = t; sinceFrames = 0;
+    if (gap < 0 || gap > 250) { gaps.length = 0; frameMs = 0; }   // first frame, or back from a pause: measure afresh
+    else {
+      // The median of the last frames, so a change of frame rate (slow frames while the
+      // browser switches pages, then the screen's own rate) is followed within a few frames;
+      // a stale measurement made the pattern race for a second.
+      gaps.push(gap);
+      if (gaps.length > 16) gaps.shift();
+      if (gaps.length >= 8) {
+        frameMs = Math.min(50, Math.max(2, [...gaps].sort((a, b) => a - b)[gaps.length >> 1]));
+        skip = Math.max(1, Math.round(16.7 / frameMs));
+      }
     }
     if (!frameMs || !visible || document.hidden) return;   // holds still until the first measurement
     clock += frameMs;

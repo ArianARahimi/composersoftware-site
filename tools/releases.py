@@ -8,10 +8,12 @@ Any element written like
 gets the latest release of OWNER/REPO. Views:
   version  "v1.2.3"
   iso      "2026-01-31T12:00:00Z", for scripts
+  first-iso  when the project was first released, for scripts
   tag      "v1.2.3, 2026-01-31"
   notes    version, date, what's new and a link to the release
 Items marked <!--item OWNER/REPO-->...<!--/item--> inside <!--latest-->...<!--/latest-->
-are put in order of their latest release, newest first.
+are put newest project first: by first release, or by the latest release whose notes have
+a line saying just "Overhaul" (a major update that remakes the project).
 What's new is the release notes' "What's new" (or "Changes"/"Changelog")
 section when there is one, otherwise the commit titles since the release
 before it. If GitHub can't be reached, the fallback text stays.
@@ -88,7 +90,43 @@ def whats_new(repo, rel, releases):
     return bullets("\n".join(reversed(titles))) if titles else ""
 
 
+def all_releases(repo, cache):
+    """Every published release of the project (all pages of the list), oldest first."""
+    key = repo + "#all"
+    if key not in cache:
+        page, found = 1, []
+        while True:
+            batch = get(f"{repo}/releases?per_page=100&page={page}")
+            found += [r for r in batch if not r["draft"] and not r["prerelease"]]
+            if len(batch) < 100:
+                break
+            page += 1
+        cache[key] = sorted(found, key=lambda r: r["published_at"])
+    return cache[key]
+
+
+def first_release(repo, cache):
+    """The project's first published release, or None."""
+    releases = all_releases(repo, cache)
+    return releases[0] if releases else None
+
+
+OVERHAUL = re.compile(r"^[#*\s]*overhaul[*\s]*$", re.I | re.M)   # a line or heading saying just "Overhaul"
+
+
+def project_date(repo, cache):
+    """When the project counts as new for the Latest order: its first release, or its latest
+    release whose notes say "Overhaul" (a major update that remakes it). None if no release."""
+    releases = all_releases(repo, cache)
+    marked = [r for r in releases if OVERHAUL.search(r.get("body") or "")]
+    chosen = marked[-1] if marked else (releases[0] if releases else None)
+    return chosen["published_at"] if chosen else None
+
+
 def render(repo, view, cache):
+    if view == "first-iso":   # for scripts: when the project was first released
+        first = first_release(repo, cache)
+        return html.escape(first["published_at"]) if first else None
     if repo not in cache:
         releases = [r for r in get(f"{repo}/releases?per_page=10") if not r["draft"] and not r["prerelease"]]
         cache[repo] = (releases[0], releases) if releases else None
@@ -115,15 +153,14 @@ ITEM = re.compile(r"<!--item ([\w.-]+/[\w.-]+)-->.*?<!--/item-->", re.S)
 
 
 def newest_first(text, cache):
-    """Inside <!--latest-->...<!--/latest-->, puts the <!--item OWNER/REPO--> blocks in
-    order of their latest release, newest first. Any date missing: the order stays."""
+    """Inside <!--latest-->...<!--/latest-->, puts the <!--item OWNER/REPO--> blocks newest
+    project first (see project_date). Any date missing: the order stays."""
     def sort(m):
         items = [(i[1], i[0]) for i in ITEM.finditer(m[2])]
         dates = []
         for repo, _ in items:
             try:
-                render(repo, "tag", cache)   # fills the cache
-                dates.append(cache[repo][0]["published_at"] if cache[repo] else None)
+                dates.append(project_date(repo, cache))
             except Exception as e:  # keep the order, never break the build
                 print(f"warning: {repo}: {e}", file=sys.stderr)
                 dates.append(None)
