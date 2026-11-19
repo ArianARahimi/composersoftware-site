@@ -20,6 +20,9 @@ Static site, deployed by GitHub Actions (`.github/workflows/deploy.yml`).
 - `fonts/PxPlus_IBM_VGA_8x16-cyrillic.woff2`: only the Cyrillic letters from PxPlus_IBM_VGA_8x16
   (same pack and license), for the glitch title intro
 
+Short and old addresses (`/vtq`, `/qf`, ...) lead to the project pages: the list is in
+`tools/redirects.py`, which writes their redirect pages when the site is built.
+
 Links use clean addresses (`/projects`, not `projects.html`). GitHub Pages serves
 those; a local preview server may need the `.html` typed in.
 
