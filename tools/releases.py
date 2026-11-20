@@ -18,7 +18,7 @@ What's new is the release notes' "What's new" (or "Changes"/"Changelog")
 section when there is one, otherwise the commit titles since the release
 before it. If GitHub can't be reached, the fallback text stays.
 A NEW! badge marked <!--new-->...<!--/new--> (holding a first-iso release time) is left
-out of the page altogether once that first release is two weeks old.
+out of the page altogether once that first release is 72 hours old.
 It also writes feed.xml (Atom): the releases of every project marked on the pages, newest
 first, for feed readers.
 """
@@ -179,7 +179,7 @@ def newest_first(text, cache):
 
 NEW = re.compile(r"<!--new-->(.*?)<!--/new-->", re.S)
 FIRST_ISO = re.compile(r'data-view="first-iso">([^<]*)<')
-NEW_HOURS = 14 * 24   # two weeks
+NEW_HOURS = 72
 
 
 def drop_old_badges(text, now=None):

@@ -175,7 +175,7 @@ if (title && intro.contains("intro")) {
   setTimeout(() => { if (!title.querySelector(".raster")) skip(); }, 1500);
 }
 
-// NEW!: shown on a project for its first two weeks after its first release (the build writes
+// NEW!: shown on a project for its first 72 hours after its first release (the build writes
 // the time, and leaves the badge out altogether after that). It rises once the tagline has
 // typed (on the Projects page, just after loading), drops behind the name while the project is
 // pointed at, and rises and types out again after. The rise and drop are a CSS transition, so
@@ -184,7 +184,7 @@ const tagline = document.querySelector(".type");
 for (const date of document.querySelectorAll(".new-date")) {
   const badge = date.parentElement.querySelector(".new");
   const age = Date.now() - Date.parse(date.textContent);
-  if (!badge || !(age < 14 * 24 * 3600 * 1000)) continue;
+  if (!badge || !(age < 72 * 3600 * 1000)) continue;
   badge.hidden = false;
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   // pointed at: a Latest row's links, or a project window lit up to open (or its title focused)
