@@ -208,13 +208,17 @@ body > footer.site { width: 100%; }   /* auto side margins would shrink these to
 /* room for error: name and text answer across the row's full height and the gaps between columns */
 .latest-title, .latest-text { position: relative; }
 .latest-title::before, .latest-text::before { content: ""; position: absolute; inset: -16px -1ch -12px; }
-/* name and text both open the project page; pointing at either turns both RELEASED green */
+/* no NEW! showing: no extra room above the rows, 16px all round */
+.latest-win:not(:has(.new:not([hidden]))) .win-body { padding: 4px 16px; }
+.latest-win:not(:has(.new:not([hidden]))) .latest > li { padding-top: 12px; }
+.latest-win:not(:has(.new:not([hidden]))) :is(.latest-title, .latest-text)::before { top: -12px; }
+/* name and text both open the project page; pointing at either turns both yellow */
 .latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-title {
   color: var(--bg);
-  background: var(--green);
+  background: var(--yellow);
 }
 .latest > li:has(.latest-title:hover, .latest-text:hover, .latest-title:focus-visible, .latest-text:focus-visible) .latest-text {
-  color: var(--green);
+  color: var(--yellow);
   text-decoration: underline;
 }
 .latest-version { color: var(--bright-cyan); }
