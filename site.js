@@ -130,6 +130,15 @@ for (const card of document.querySelectorAll(".card-link")) {
     if (e.ctrlKey || e.metaKey) window.open(card.dataset.href);
     else location.href = card.dataset.href;
   });
+  // middle click: a new tab, not Windows Firefox's autoscroll
+  card.addEventListener("mousedown", (e) => {
+    if (e.button === 1 && opensPage(card, e)) e.preventDefault();
+  });
+  card.addEventListener("auxclick", (e) => {
+    if (e.button !== 1 || !opensPage(card, e) || String(getSelection())) return;
+    e.preventDefault();
+    window.open(card.dataset.href);
+  });
 }
 
 
