@@ -185,6 +185,20 @@
       </details>
 
       <details class="topic">
+        <summary>Check your download</summary>
+        <p>Updates get checked for you. Your first download doesn't, so here's how to make sure it's the real thing.</p>
+        <ol class="steps">
+          <li>From the same release as your file, download <code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>.</li>
+          <li>Make the key file: <code class="wrap">echo 302a300506032b6570032100f0120310513560626fd41751cfe2e4519abe1f5f6f71a35691d16dfa48e6adac | xxd -r -p | openssl pkey -pubin -inform DER -out release-key.pem</code></li>
+          <li>Check the signature: <code class="wrap">openssl pkeyutl -verify -pubin -inkey release-key.pem -rawin -in SHA256SUMS -sigfile SHA256SUMS.sig</code></li>
+          <li>Check your file: <code>sha256sum --ignore-missing -c SHA256SUMS</code></li>
+        </ol>
+        <p>You want "Signature Verified Successfully" and OK next to your file. Anything else, don't open it.
+          Needs OpenSSL 3. On Windows, use Git Bash. On a Mac, <code>brew install openssl</code> first.</p>
+        <p>Release key: <code class="wrap">f0120310513560626fd41751cfe2e4519abe1f5f6f71a35691d16dfa48e6adac</code></p>
+      </details>
+
+      <details class="topic">
         <summary>Uninstall</summary>
         <ul class="list">
           <li>Windows: Settings, Apps, VirusTotal Quarantine, Uninstall</li>
